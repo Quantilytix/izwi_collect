@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 1257" width="1040" height="1257">
+<rect x="0" y="0" width="1040" height="1257" fill="#FFFFFF" id="bgrect"/>
+<text x="40" y="46" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="800" letter-spacing="2" fill="#1F6F5C" text-anchor="start">IZWI</text>
+<text x="40" y="74" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="400" fill="#6B7280" text-anchor="start">Consent to corpus, end to end.</text>
+<text x="40" y="108" font-family="Arial, Helvetica, sans-serif" font-size="13.5" font-weight="700" letter-spacing="1" fill="#1F6F5C" text-anchor="start">1. ANDROID APP, OFFLINE-FIRST</text>
+<rect x="40" y="122" width="304.0" height="145" rx="10" fill="#F1F6F5" stroke="#D3DEDA" stroke-width="1.5"/>
+<text x="56" y="150" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#14231F" text-anchor="start">Consent &amp; session</text>
+<text x="56" y="170" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" fill="#6B7280" text-anchor="start">Speaker + session ID</text>
+<text x="56" y="187" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" fill="#6B7280" text-anchor="start">Consent statement shown</text>
+<text x="56" y="204" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" fill="#6B7280" text-anchor="start">and its version recorded</text>
+<rect x="368.0" y="122" width="304.0" height="145" rx="10" fill="#F1F6F5" stroke="#D3DEDA" stroke-width="1.5"/>
+<text x="384.0" y="150" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#14231F" text-anchor="start">Scripted recording</text>
+<text x="384.0" y="170" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" fill="#6B7280" text-anchor="start">One prompt at a time</text>
+<text x="384.0" y="187" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" fill="#6B7280" text-anchor="start">Level meter, replay, retake</text>
+<text x="384.0" y="204" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" fill="#6B7280" text-anchor="start">Skip with a reason</text>
+<rect x="696.0" y="122" width="304.0" height="145" rx="10" fill="#F1F6F5" stroke="#D3DEDA" stroke-width="1.5"/>
+<text x="712.0" y="150" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#14231F" text-anchor="start">Local review queue</text>
+<text x="712.0" y="170" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" fill="#6B7280" text-anchor="start">Fix a transcript</text>
+<text x="712.0" y="187" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" fill="#6B7280" text-anchor="start">Mark accepted / retake</text>
+<text x="712.0" y="204" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" fill="#6B7280" text-anchor="start">Nothing uploads on its own</text>
+<line x1="520" y1="267" x2="520" y2="293" stroke="#1F6F5C" stroke-width="2"/>
+<polygon points="514,293 526,293 520,302" fill="#1F6F5C"/>
+<text x="40" y="318" font-family="Arial, Helvetica, sans-serif" font-size="13.5" font-weight="700" letter-spacing="1" fill="#1F6F5C" text-anchor="start">2. ON-DEVICE QUALITY CHECKS</text>
+<rect x="40" y="332" width="960" height="80" rx="10" fill="#F1F6F5" stroke="#D3DEDA" stroke-width="1.5"/>
+<text x="56" y="360" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" fill="#14231F" text-anchor="start">Clipping · excessive silence · loudness · duration · background-noise proxy</text>
+<text x="56" y="380" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" fill="#6B7280" text-anchor="start">Every check warns and recommends a retake. None of them silently delete a recording.</text>
+<line x1="520" y1="412" x2="520" y2="438" stroke="#1F6F5C" stroke-width="2"/>
+<polygon points="514,438 526,438 520,447" fill="#1F6F5C"/>
+<text x="40" y="463" font-family="Arial, Helvetica, sans-serif" font-size="13.5" font-weight="700" letter-spacing="1" fill="#1F6F5C" text-anchor="start">3. BOUNDED BATCH EXPORT</text>
+<rect x="40" y="477" width="960" height="90" rx="10" fill="#F1F6F5" stroke="#D3DEDA" stroke-width="1.5"/>
+<text x="56" y="505" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#14231F" text-anchor="start">~20–30 minutes per batch, zipped</text>
+<text x="56" y="525" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" fill="#6B7280" text-anchor="start">audio/&lt;clip_id&gt;.wav · manifest.csv · metadata.jsonl · consent.json</text>
+<text x="56" y="544" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" fill="#6B7280" text-anchor="start">A full two-hour session is too large for one upload — batches keep each one safely bounded.</text>
+<line x1="520" y1="567" x2="520" y2="593" stroke="#1F6F5C" stroke-width="2"/>
+<polygon points="514,593 526,593 520,602" fill="#1F6F5C"/>
+<text x="40" y="618" font-family="Arial, Helvetica, sans-serif" font-size="13.5" font-weight="700" letter-spacing="1" fill="#1F6F5C" text-anchor="start">4. SMART-Q VOICE RELAY (HUGGING FACE SPACE)</text>
+<rect x="40" y="632" width="468.0" height="120" rx="10" fill="#F1F6F5" stroke="#D3DEDA" stroke-width="1.5"/>
+<text x="56" y="660" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#14231F" text-anchor="start">Validates the batch</text>
+<text x="56" y="680" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" fill="#6B7280" text-anchor="start">ZIP structure, decodable audio,</text>
+<text x="56" y="697" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" fill="#6B7280" text-anchor="start">sample rate, transcripts,</text>
+<text x="56" y="714" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" fill="#6B7280" text-anchor="start">batch size limits</text>
+<rect x="532.0" y="632" width="468.0" height="120" rx="10" fill="#F1F6F5" stroke="#D3DEDA" stroke-width="1.5"/>
+<text x="548.0" y="660" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#14231F" text-anchor="start">Holds the write token</text>
+<text x="548.0" y="680" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" fill="#6B7280" text-anchor="start">The only component that does.</text>
+<text x="548.0" y="697" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" fill="#6B7280" text-anchor="start">The app carries just a narrow</text>
+<text x="548.0" y="714" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" fill="#6B7280" text-anchor="start">X-Relay-Key, never this token.</text>
+<line x1="520" y1="752" x2="520" y2="778" stroke="#1F6F5C" stroke-width="2"/>
+<polygon points="514,778 526,778 520,787" fill="#1F6F5C"/>
+<text x="40" y="803" font-family="Arial, Helvetica, sans-serif" font-size="13.5" font-weight="700" letter-spacing="1" fill="#1F6F5C" text-anchor="start">5. HUGGING FACE DATASET REPO</text>
+<rect x="40" y="817" width="960" height="80" rx="10" fill="#F1F6F5" stroke="#D3DEDA" stroke-width="1.5"/>
+<text x="56" y="845" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#14231F" text-anchor="start">Staged as a pull request — never a direct commit to main</text>
+<text x="56" y="865" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" fill="#6B7280" text-anchor="start">sessions/&lt;speaker_id&gt;/&lt;session_id&gt;/&lt;batch_id&gt;/</text>
+<line x1="520" y1="897" x2="520" y2="923" stroke="#1F6F5C" stroke-width="2"/>
+<polygon points="514,923 526,923 520,932" fill="#1F6F5C"/>
+<text x="40" y="948" font-family="Arial, Helvetica, sans-serif" font-size="13.5" font-weight="700" letter-spacing="1" fill="#1F6F5C" text-anchor="start">6. HUMAN REVIEW AND MERGE</text>
+<rect x="40" y="962" width="468.0" height="100" rx="10" fill="#F1F6F5" stroke="#D3DEDA" stroke-width="1.5"/>
+<text x="56" y="990" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#14231F" text-anchor="start">Dashboard</text>
+<text x="56" y="1010" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" fill="#6B7280" text-anchor="start">Open pull requests</text>
+<text x="56" y="1027" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" fill="#6B7280" text-anchor="start">Merged-corpus stats</text>
+<rect x="532.0" y="962" width="468.0" height="100" rx="10" fill="#F1F6F5" stroke="#D3DEDA" stroke-width="1.5"/>
+<text x="548.0" y="990" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#B23A2E" text-anchor="start">Reviewer merges</text>
+<text x="548.0" y="1010" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" fill="#6B7280" text-anchor="start">Inspects the PR by hand</text>
+<text x="548.0" y="1027" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" fill="#6B7280" text-anchor="start">Approves onto main, or not</text>
+<line x1="520" y1="1062" x2="520" y2="1088" stroke="#1F6F5C" stroke-width="2"/>
+<polygon points="514,1088 526,1088 520,1097" fill="#1F6F5C"/>
+<text x="40" y="1113" font-family="Arial, Helvetica, sans-serif" font-size="13.5" font-weight="700" letter-spacing="1" fill="#1F6F5C" text-anchor="start">7. HANDOFF TO PLAN A</text>
+<rect x="40" y="1127" width="960" height="90" rx="10" fill="#F1F6F5" stroke="#D3DEDA" stroke-width="1.5"/>
+<text x="56" y="1155" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" fill="#14231F" text-anchor="start">Approved audio, corrected transcripts, consent + session metadata,</text>
+<text x="56" y="1175" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" fill="#14231F" text-anchor="start">a quality summary, and a held-out officer evaluation set.</text>
+<text x="56" y="1194" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" fill="#6B7280" text-anchor="start">Officer identity adaptation runs as its own experiment — not mixed blindly into the general Shona baseline.</text>
+</svg>

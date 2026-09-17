@@ -121,6 +121,7 @@ class RecordingActivity : AppCompatActivity() {
         binding.retakeButton.isEnabled = false
         binding.acceptButton.isEnabled = false
         binding.skipButton.isEnabled = true
+        binding.warningText.visibility = android.view.View.GONE
     }
 
     private fun startRecording() {

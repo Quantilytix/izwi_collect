@@ -50,21 +50,24 @@
 
         <Button
             android:id="@+id/playButton"
-            style="?android:attr/borderlessButtonStyle"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textColor="@color/izwi_primary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Play" />
 
         <Button
             android:id="@+id/editTranscriptButton"
-            style="?android:attr/borderlessButtonStyle"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textColor="@color/izwi_primary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Edit transcript" />
 
         <Button
             android:id="@+id/toggleStatusButton"
-            style="?android:attr/borderlessButtonStyle"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textColor="@color/izwi_primary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Mark retake" />

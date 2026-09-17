@@ -23,7 +23,8 @@
 
     <Button
         android:id="@+id/retryButton"
-        style="?android:attr/borderlessButtonStyle"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textColor="@color/izwi_primary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Retry"

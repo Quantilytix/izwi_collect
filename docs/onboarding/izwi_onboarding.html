@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Izwi — Recording your voice</title>
+<style>
+  @page { size: letter; margin: 0; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #ffffff;
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: #1a1a1a;
+  }
+  .page {
+    width: 850px;
+    min-height: 1100px;
+    margin: 0 auto;
+    padding: 56px 64px;
+  }
+  .mast {
+    color: #1F6F5C;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 3px;
+    margin-bottom: 6px;
+  }
+  h1 {
+    font-size: 40px;
+    margin: 0 0 18px 0;
+    color: #14231F;
+    letter-spacing: -0.5px;
+  }
+  p.intro {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #2a2a2a;
+    margin: 0 0 26px 0;
+  }
+  .callout {
+    border: 1.5px solid;
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+  }
+  .callout.warn { border-color: #C0392B; background: #FBEEEC; }
+  .callout.positive { border-color: #1F6F5C; background: #EAF3F1; }
+  .callout-title {
+    font-weight: 700;
+    font-size: 12.5px;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .callout.warn .callout-title { color: #C0392B; }
+  .callout.positive .callout-title { color: #1F6F5C; }
+  .callout ul { margin: 0; padding-left: 20px; }
+  .callout li { font-size: 14px; line-height: 1.55; margin-bottom: 4px; }
+  h2 {
+    font-size: 18px;
+    color: #14231F;
+    margin: 30px 0 12px 0;
+  }
+  ol.steps { margin: 0; padding-left: 22px; }
+  ol.steps li { font-size: 14.5px; line-height: 1.6; margin-bottom: 10px; }
+  ol.steps li::marker { color: #1F6F5C; font-weight: 700; }
+  ol.steps b { color: #14231F; }
+  ul.donts { margin: 0; padding-left: 20px; }
+  ul.donts li { font-size: 14.5px; line-height: 1.6; margin-bottom: 8px; }
+  ul.donts b { color: #14231F; }
+  .footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid #E5E5E5;
+    font-size: 13.5px;
+    color: #1F6F5C;
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="mast">IZWI</div>
+    <h1>Recording your voice</h1>
+    <p class="intro">
+      We are building a synthetic version of your voice so Smart-Q can speak
+      its replies in Shona, in a voice its users already recognise. Nothing
+      about this recording session is automatic: you agree to it first, you
+      review every clip before it leaves your phone, and a person checks it
+      again before it is ever used to train anything.
+    </p>
+
+    <div class="callout warn">
+      <div class="callout-title">BEFORE YOU RECORD</div>
+      <ul>
+        <li>Read the consent screen in full and ask questions before you agree to anything.</li>
+        <li>Pick a quiet room. Use the same seat and the same distance from the phone every session.</li>
+        <li>Speak the way you actually talk to a customer, not slower, not more formal.</li>
+      </ul>
+    </div>
+
+    <h2>Each recording session</h2>
+    <ol class="steps">
+      <li><b>Accept the consent screen once.</b> Enter your name or ID, the app remembers it for the whole session.</li>
+      <li><b>One sentence at a time.</b> Read the prompt on screen aloud after you tap Record.</li>
+      <li><b>Listen back before moving on.</b> Use Replay to check it sounds right, Retake if it doesn't.</li>
+      <li><b>Skip a sentence that doesn't make sense.</b> Say why, don't force it.</li>
+      <li><b>Review before anything leaves your phone.</b> Fix a transcript or flag a retake in the review queue — nothing uploads on its own.</li>
+      <li><b>Sync only when you choose to.</b> Tap Sync now. Nothing leaves the phone until you do.</li>
+      <li><b>A person checks every batch.</b> Your recordings become a pull request; someone reviews it before it trains anything.</li>
+    </ol>
+
+    <div class="callout positive">
+      <div class="callout-title">CONSENT IS NOT ONE AND DONE</div>
+      <ul>
+        <li>You can withdraw at any time. Say so, and your raw recordings are deleted.</li>
+        <li>This voice is for Smart-Q only — never resold or reused elsewhere without asking you again, separately.</li>
+        <li>Smart-Q tells its own users when they're hearing a synthetic voice, not you live.</li>
+      </ul>
+    </div>
+
+    <h2>Three things not to do</h2>
+    <ul class="donts">
+      <li><b>Don't record in a noisy room or with music nearby.</b> Background noise gets learned as part of the voice.</li>
+      <li><b>Don't perform or polish your voice.</b> Ordinary and natural is what makes it useful.</li>
+      <li><b>Don't skip the review queue.</b> Check it before every sync — that's your last look before a person reviews it too.</li>
+    </ul>
+
+    <div class="footer">Get the app: github.com/Quantilytix/izwi/releases/latest/download/app-debug.apk</div>
+  </div>
+</body>
+</html>
