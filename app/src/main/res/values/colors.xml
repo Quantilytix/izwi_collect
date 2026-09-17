@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="izwi_primary">#1F6F5C</color>
+    <color name="izwi_primary_dark">#164F42</color>
+    <color name="izwi_accent">#E8A93B</color>
+    <color name="izwi_background">#FFFFFF</color>
+    <color name="izwi_warning">#C0392B</color>
+    <color name="izwi_muted">#6B7280</color>
+</resources>

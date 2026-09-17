@@ -1,0 +1,39 @@
+package com.quantilytix.izwi.data
+
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface ClipDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(clip: ClipEntity)
+
+    @Update
+    suspend fun update(clip: ClipEntity)
+
+    @Query("SELECT * FROM clips WHERE sessionId = :sessionId ORDER BY recordedAtUtc ASC")
+    fun observeForSession(sessionId: String): Flow<List<ClipEntity>>
+
+    @Query("SELECT * FROM clips WHERE sessionId = :sessionId ORDER BY recordedAtUtc ASC")
+    suspend fun getForSession(sessionId: String): List<ClipEntity>
+
+    @Query(
+        "SELECT * FROM clips WHERE sessionId = :sessionId " +
+            "AND reviewStatus IN ('accepted', 'warning') AND batchId IS NULL " +
+            "ORDER BY recordedAtUtc ASC"
+    )
+    suspend fun getUnbatchedApproved(sessionId: String): List<ClipEntity>
+
+    @Query("UPDATE clips SET batchId = :batchId, uploadStatus = :status WHERE clipId IN (:clipIds)")
+    suspend fun assignBatch(clipIds: List<String>, batchId: String, status: String)
+
+    @Query("UPDATE clips SET uploadStatus = :status WHERE batchId = :batchId")
+    suspend fun setUploadStatusForBatch(batchId: String, status: String)
+
+    @Query("SELECT COUNT(*) FROM clips WHERE sessionId = :sessionId AND promptId = :promptId AND reviewStatus != 'retake'")
+    suspend fun countAcceptedForPrompt(sessionId: String, promptId: String): Int
+}
