@@ -26,9 +26,10 @@ Consent to corpus, end to end.
 | Stage | What | Where |
 |---|---|---|
 | Session setup | Speaker ID, session ID, script version | `SessionSetupActivity.kt` (consent-gated `ConsentActivity.kt` kept for later) |
-| Recording | Mono PCM WAV, 24 kHz preferred, 16 kHz fallback, live level meter | `WavRecorder.kt`, `LevelMeterView.kt` |
+| Script | Add, edit, delete, or import prompts; every change persists immediately | `ScriptEditorActivity.kt`, `ScriptRepository.kt` |
+| Recording | Mono PCM WAV, 24 kHz preferred, 16 kHz fallback, live level meter, edit-prompt-before-recording | `WavRecorder.kt`, `LevelMeterView.kt`, `RecordingActivity.kt` |
 | Quality checks | Clipping, excessive silence, loudness, duration, background-noise proxy — warns, never deletes | `QualityAnalyzer.kt` |
-| Review queue | Transcript correction, accept/retake toggle, session summary | `ReviewQueueActivity.kt` |
+| Review queue | Transcript correction (forces a retake, since edited text stops matching recorded audio), accept/retake toggle, session summary, cumulative 2h-baseline/5h meter | `ReviewQueueActivity.kt`, `SessionMeterView.kt` |
 | Export | Bounded ~20–30 minute zip batches: `audio/`, `manifest.csv`, `metadata.jsonl`, `consent.json` | `BatchExporter.kt` |
 | Upload | Relay call authenticated by a narrow `X-Relay-Key`, WorkManager retry on one enqueued attempt, never automatic | `RelayClient.kt`, `UploadWorker.kt` |
 | Relay | Validates structure, audio, sample rate, and transcripts; opens a pull request; holds the only HF write token | `../smart-q-voice-relay` (FastAPI, Hugging Face Space) |
@@ -43,9 +44,11 @@ That pass caught three real bugs, now fixed: the `DayNight` theme rendered body 
 
 Not yet done: an actual recording session with the real speaker reading real prompts (this pass only exercised the pipeline mechanically), and a full ten-clip go/no-go rehearsal.
 
+A second device pass caught three more issues, also fixed: the review queue and sync status headers sat under the status bar, their bottom buttons sat under the navigation bar, and there was no way to fix a prompt's wording before recording it.
+
 ## Android: from consent to corpus
 
-**Session setup** takes a speaker ID and starts a session; it resumes safely if the app restarts mid-session. **Recording** shows one prompt at a time with a live level meter, replay, retake, and skip-with-reason. **Review** lets you fix a transcript or flag a clip for retake before anything leaves the phone. **Sync** is a single explicit action — nothing uploads on its own — and shows the resulting pull request URL once the relay accepts a batch.
+**Session setup** takes a speaker ID and starts a session; it resumes safely if the app restarts mid-session, and links to **Script** for adding, editing, deleting, or importing prompts before a session starts. **Recording** shows one prompt at a time with a live level meter, replay, retake, skip-with-reason, and an Edit prompt action for fixing wording before it's read aloud. **Review** lets you fix a transcript (which forces a retake, since the audio no longer certainly matches) or flag a clip for retake, and shows a cumulative meter of this speaker's total recorded time against a 2-hour baseline — recording is meant to continue well past it, not stop there. **Sync** is a single explicit action — nothing uploads on its own — and shows the resulting pull request URL once the relay accepts a batch.
 
 A one-page printable guide for the speaker is in [`docs/onboarding`](docs/onboarding/Izwi_Recording_Voice.pdf).
 
@@ -60,7 +63,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 ## Limitations
 
-- The seed script (`app/src/main/assets/script_v1.json`, 40 prompts) is machine-drafted and explicitly flagged in its own `note` field as unverified Shona. It needs a native speaker's review and expansion toward a 1,000–1,800 utterance target before a real session.
+- The seed script (`app/src/main/assets/script_v1.json`, 5,068 prompts, sized for 5+ hours) is machine-generated and explicitly flagged in its own `note` field as unverified Shona. Most of it is templated carrier phrases (numbers/names/places/items filled into a small set of validated patterns), which is a legitimate way to reach broad slot coverage but still needs a native speaker's review before a real session — treat the volume as a pool to draw from and prune, not a script to read start to finish.
 - All three Hugging Face resources (dataset, relay, dashboard) live under the `rairo/` personal namespace, not `quantilytix/` as originally planned — the available token wasn't scoped to the org. Transfer once an org-scoped token exists.
 - The consent copy in `ConsentActivity` covers purpose, use, storage, retention, withdrawal, scope, and disclosure, but hasn't been reviewed by counsel, and isn't active in the current build (see the consent screen note above).
 - App icon is a placeholder vector mark, not a designed brand asset.
