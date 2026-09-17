@@ -14,10 +14,9 @@
         android:theme="@style/Theme.Izwi"
         android:usesCleartextTraffic="false">
 
-        <!-- Consent screen is disabled for now: the current speaker (Audry) is a
-             Quantilytix shareholder recording internally, not an external
-             contributor. Re-wire the LAUNCHER intent-filter back onto
-             ConsentActivity when this ships to a public/external speaker. -->
+        <!-- Consent screen is disabled for now for this internal recording pass.
+             Re-wire the LAUNCHER intent-filter back onto ConsentActivity when
+             this ships to a public/external speaker. -->
         <activity android:name=".consent.ConsentActivity" android:exported="false" />
 
         <activity

@@ -1,89 +1,70 @@
-# Izwi — Smart-Q officer voice capture
+# Izwi
 
-Android app implementing Plan B of the SAVE / Smart-Q Shona TTS project:
-[PLAN_B_officer_voice_capture_app.md](../SAVE_tts/PLAN_B_officer_voice_capture_app.md).
-Captures the Smart-Q business development officer's consented Shona voice
-for the production TTS voice, separate from Plan A's internal Shona
-benchmark.
+[![Download the APK](https://img.shields.io/badge/download-Izwi%20APK-1F6F5C?style=for-the-badge)](https://github.com/Quantilytix/izwi/releases/latest/download/app-debug.apk)
+[![Latest release](https://img.shields.io/github/v/release/Quantilytix/izwi?style=for-the-badge&label=latest&color=14231F)](https://github.com/Quantilytix/izwi/releases/latest)
 
-`izwi` is Shona for "voice."
+`izwi` is Shona for "voice." Offline-first capture of Smart-Q's production Shona voice, recorded from a single consented speaker in Zimbabwe. Sibling of [Injini](https://github.com/rapha18th/injini), Smart-Q's acoustic-monitoring app, and built on the same field-tested pattern: record offline, review before anything leaves the phone, sync only when told to, stage every upload as a pull request, let a person merge it.
 
-## Status
+The link above always points at the current release. Download it straight to a phone, allow installs from the browser or file manager when asked, and install. Debug-signed, no Play Store, this is an internal-recording build.
 
-Phase 1–5 implemented (project shell, capture, script/review, quality
-checks, export/upload). **Not yet through Phase 6** (device rehearsal,
-go/no-go gate) — this has been compiled (`./gradlew assembleDebug`
-succeeds) and the relay has been smoke-tested end to end, but **not run on
-a physical device**. Do not use it for Audry's real session before Phase 6
-passes.
+## The idea
+
+Smart-Q's voice replies need a Shona voice its users already recognise. Two tracks feed that goal: an internal benchmark measuring the best Shona TTS buildable today from existing open datasets and checkpoints, and Izwi, the actual production track, capturing a real Smart-Q speaker's voice under explicit consent, staged and reviewed before it ever trains anything.
+
+The app borrows Injini's proven shape rather than inventing a new one: offline-first recording, visible capture feedback, a local queue and retry, an explicit sync action, metadata-rich exports, server-side validation, Hugging Face pull-request staging, and human review before data enters the training branch. It shares none of Injini's machine-monitoring concepts.
+
+**Consent screen note.** The consent gate is switched off for this internal recording pass — `SessionSetupActivity` is the launcher and just takes a speaker ID. `ConsentActivity` and its full consent copy are kept in the codebase untouched and get wired back in as the launcher the moment this ships to a public or external speaker.
 
 ## Architecture
 
-```
-Izwi (Android app)              Smart-Q Voice Relay (HF Space)         Dataset repo (HF)
-  consent + recording      -->    validates batch (X-Relay-Key)   -->   pull request
-  local review queue              holds the HF write token               human review + merge
-  bounded batch export            never exposes it to the app
-```
+Consent to corpus, end to end.
 
-- **App**: `com.quantilytix.izwi`, Kotlin, classic Views (matches Injini's
-  proven pattern), Room for local storage, WorkManager for explicit
-  (non-automatic) upload retries, OkHttp for the relay call.
-- **Relay**: `../smart-q-voice-relay` — FastAPI on Hugging Face Spaces
-  (`rairo/smart-q-voice-relay`, public — see security note below). Holds
-  the only HF write token in the whole pipeline.
-- **Dataset**: `rairo/smart-q-shona-voice-corpus` (private). Every batch
-  lands as a PR, never a direct commit to `main`.
-- **Dashboard**: `../smart-q-voice-dashboard` — read-only Streamlit Space
-  (`rairo/smart-q-voice-dashboard`, private) showing open PRs and merged
-  corpus stats.
+![Izwi architecture, consent to corpus](diagrams/architecture.svg)
 
-## Namespace note
+## The pipeline
 
-The plan document targets `quantilytix/...`. The HF token available when
-this was built only had write scope to the personal `rairo` namespace, not
-the Quantilytix org, so all three resources were created under `rairo/`
-instead. Transfer to `quantilytix/` once an org-scoped token is available —
-HF supports repo/space transfer without breaking most references.
+| Stage | What | Where |
+|---|---|---|
+| Session setup | Speaker ID, session ID, script version | `SessionSetupActivity.kt` (consent-gated `ConsentActivity.kt` kept for later) |
+| Recording | Mono PCM WAV, 24 kHz preferred, 16 kHz fallback, live level meter | `WavRecorder.kt`, `LevelMeterView.kt` |
+| Quality checks | Clipping, excessive silence, loudness, duration, background-noise proxy — warns, never deletes | `QualityAnalyzer.kt` |
+| Review queue | Transcript correction, accept/retake toggle, session summary | `ReviewQueueActivity.kt` |
+| Export | Bounded ~20–30 minute zip batches: `audio/`, `manifest.csv`, `metadata.jsonl`, `consent.json` | `BatchExporter.kt` |
+| Upload | Relay call authenticated by a narrow `X-Relay-Key`, WorkManager retry on one enqueued attempt, never automatic | `RelayClient.kt`, `UploadWorker.kt` |
+| Relay | Validates structure, audio, sample rate, and transcripts; opens a pull request; holds the only HF write token | `../smart-q-voice-relay` (FastAPI, Hugging Face Space) |
+| Dataset | Every batch lands as a PR under `sessions/<speaker_id>/<session_id>/<batch_id>/`, never a direct commit | `rairo/smart-q-shona-voice-corpus` (private) |
+| Dashboard | Open PRs and merged-corpus stats, read-only | `../smart-q-voice-dashboard` (Streamlit, Hugging Face Space) |
 
-## Security
+## Verified on device
 
-- The app bundles only a narrow relay upload key (`local.properties` →
-  `BuildConfig.RELAY_API_KEY`), never an HF token. `local.properties` is
-  gitignored; the key currently baked into the debug build is the one
-  provisioned as the relay's `RELAY_API_KEY` secret.
-- The relay Space is **public** so the app can reach it without an HF
-  login — access control is the `X-Relay-Key` header check inside
-  `app.py`, not HF's space-privacy gate. Confirmed with the user before
-  making it public. The HF write token lives only in the relay's Space
-  secrets.
-- Rotate the relay key by updating both the Space secret and
-  `local.properties` together, then rebuild.
+Tested end to end on a physical Android phone, 2026-09-17: session setup, recording, on-device quality analysis, review queue, bounded batch export, and relay upload, confirmed against a real pull request on the dataset repo (closed afterward — it was a rehearsal pass, not real speech).
 
-## Building
+That pass caught three real bugs, now fixed: the `DayNight` theme rendered body text invisible against a background forced to white; `android:attr/borderlessButtonStyle` under `MaterialComponents` rendered every enabled text button white-on-white; and a stale quality warning survived tapping Retake.
 
-Requires Android SDK (compileSdk 35) and JDK 17.
+Not yet done: an actual recording session with the real speaker reading real prompts (this pass only exercised the pipeline mechanically), and a full ten-clip go/no-go rehearsal.
+
+## Android: from consent to corpus
+
+**Session setup** takes a speaker ID and starts a session; it resumes safely if the app restarts mid-session. **Recording** shows one prompt at a time with a live level meter, replay, retake, and skip-with-reason. **Review** lets you fix a transcript or flag a clip for retake before anything leaves the phone. **Sync** is a single explicit action — nothing uploads on its own — and shows the resulting pull request URL once the relay accepts a batch.
+
+A one-page printable guide for the speaker is in [`docs/onboarding`](docs/onboarding/Izwi_Recording_Voice.pdf).
+
+Build from source:
 
 ```bash
 ./gradlew assembleDebug
+adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
-`local.properties` needs `sdk.dir`, `relay.baseUrl`, and `relay.apiKey`
-(see the checked-in template values — replace before shipping a real
-build).
+`local.properties` needs `sdk.dir`, `relay.baseUrl`, and `relay.apiKey` — the relay key is a narrow upload credential, never an HF token, baked into `BuildConfig` at build time.
 
-## What's still open (see PLAN_B for full detail)
+## Limitations
 
-- **Script review**: `app/src/main/assets/script_v1.json` is a
-  machine-drafted seed script (40 prompts), explicitly flagged in its own
-  `note` field as unverified Shona. A native speaker — ideally Audry
-  herself — must review, correct, and expand it toward the 1,000–1,800
-  utterance target before real recording.
-- **Phase 6 device rehearsal**: install on Audry's actual phone, run a
-  ten-clip rehearsal, inspect the resulting PR manually. Hard gate before
-  Phase 7.
-- **Consent copy**: `strings.xml` → `consent_body` covers the required
-  points from the plan (purpose, use, storage, retention, withdrawal,
-  scope, disclosure) but has not been reviewed by counsel.
-- **App icon**: currently a placeholder vector mark, not a designed
-  brand asset.
+- The seed script (`app/src/main/assets/script_v1.json`, 40 prompts) is machine-drafted and explicitly flagged in its own `note` field as unverified Shona. It needs a native speaker's review and expansion toward a 1,000–1,800 utterance target before a real session.
+- All three Hugging Face resources (dataset, relay, dashboard) live under the `rairo/` personal namespace, not `quantilytix/` as originally planned — the available token wasn't scoped to the org. Transfer once an org-scoped token exists.
+- The consent copy in `ConsentActivity` covers purpose, use, storage, retention, withdrawal, scope, and disclosure, but hasn't been reviewed by counsel, and isn't active in the current build (see the consent screen note above).
+- App icon is a placeholder vector mark, not a designed brand asset.
+
+## Licences
+
+Code is MIT. The corpus this app produces is not openly licensed — it is consent-scoped to Smart-Q under the terms shown on the (currently disabled) consent screen, not a redistributable dataset.

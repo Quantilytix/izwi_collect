@@ -1,7 +1,7 @@
 {
   "script_version": "v1",
   "language": "sn",
-  "note": "DRAFT SEED SCRIPT. These prompts were machine-drafted, not written or checked by a native Shona speaker. A Shona speaker (ideally Audry) must review, correct, and expand this list toward the 1,000-1,800 utterance target before the Phase 6 rehearsal or any real recording session. Treat every string here as a placeholder for wording, not as verified Shona.",
+  "note": "DRAFT SEED SCRIPT. These prompts were machine-drafted, not written or checked by a native Shona speaker. A native Shona speaker must review, correct, and expand this list toward the 1,000-1,800 utterance target before the Phase 6 rehearsal or any real recording session. Treat every string here as a placeholder for wording, not as verified Shona.",
   "prompts": [
     {"id": "sales_001", "category": "sales_expense_replies", "text": "Mari yenyu yaonekwa, maita basa."},
     {"id": "sales_002", "category": "sales_expense_replies", "text": "Chikwereti chenyu chapera nhasi."},

@@ -14,12 +14,11 @@ import com.quantilytix.izwi.recording.RecordingActivity
 import kotlinx.coroutines.launch
 
 /**
- * Launcher entry point while the consent screen is disabled. The current
- * speaker (Audry) is a Quantilytix shareholder recording internally, not an
- * external contributor being asked to consent — ConsentActivity is kept
- * intact and just wired back in as the launcher once this ships to a public
- * or external speaker. A consent record is still written (accepted=true)
- * so the relay's consent.json contract is unaffected either way.
+ * Launcher entry point while the consent screen is disabled for this
+ * internal recording pass — ConsentActivity is kept intact and just wired
+ * back in as the launcher once this ships to a public or external speaker.
+ * A consent record is still written (accepted=true) so the relay's
+ * consent.json contract is unaffected either way.
  */
 class SessionSetupActivity : AppCompatActivity() {
 
