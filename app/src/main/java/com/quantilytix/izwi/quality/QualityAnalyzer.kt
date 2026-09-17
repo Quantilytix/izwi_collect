@@ -28,11 +28,25 @@ object QualityAnalyzer {
     private const val TARGET_MAX_DURATION = 8.0
     private const val HARD_MIN_DURATION = 1.0
     private const val HARD_MAX_DURATION = 15.0
+
+    // reports_and_insights prompts are deliberately multi-sentence spoken
+    // paragraphs, not short carrier phrases — the ordinary 3-8s/1-15s
+    // ranges would flag every one of them as needing a forced retake.
+    private const val LONGFORM_TARGET_MIN_DURATION = 10.0
+    private const val LONGFORM_TARGET_MAX_DURATION = 35.0
+    private const val LONGFORM_HARD_MIN_DURATION = 4.0
+    private const val LONGFORM_HARD_MAX_DURATION = 60.0
+
     private const val CLIPPING_SAMPLE_THRESHOLD = 32700
     private const val CLIPPING_FRACTION_LIMIT = 0.001
     private const val SILENCE_RMS_THRESHOLD = 300.0
 
-    fun analyze(wavFile: File): QualityResult {
+    fun analyze(wavFile: File, isLongForm: Boolean = false): QualityResult {
+        val targetMin = if (isLongForm) LONGFORM_TARGET_MIN_DURATION else TARGET_MIN_DURATION
+        val targetMax = if (isLongForm) LONGFORM_TARGET_MAX_DURATION else TARGET_MAX_DURATION
+        val hardMin = if (isLongForm) LONGFORM_HARD_MIN_DURATION else HARD_MIN_DURATION
+        val hardMax = if (isLongForm) LONGFORM_HARD_MAX_DURATION else HARD_MAX_DURATION
+
         val samples = readPcm16(wavFile)
         val sampleRate = readSampleRate(wavFile)
         val duration = if (sampleRate > 0) samples.size.toDouble() / sampleRate else 0.0
@@ -61,15 +75,17 @@ object QualityAnalyzer {
 
         val warnings = mutableListOf<String>()
         if (clippingDetected) warnings.add("clipping detected")
-        if (duration < HARD_MIN_DURATION || duration > HARD_MAX_DURATION) warnings.add("duration far outside target range")
-        else if (duration < TARGET_MIN_DURATION || duration > TARGET_MAX_DURATION) warnings.add("duration outside 3-8s target")
+        if (duration < hardMin || duration > hardMax) warnings.add("duration far outside target range")
+        else if (duration < targetMin || duration > targetMax) {
+            warnings.add("duration outside ${targetMin.toInt()}-${targetMax.toInt()}s target")
+        }
         if (speechRatio < 0.25) warnings.add("mostly silence")
         if (snrProxy < 6.0) warnings.add("low signal-to-noise ratio, possible background noise")
 
-        val qualityScore = computeScore(clippingDetected, duration, speechRatio, snrProxy)
+        val qualityScore = computeScore(clippingDetected, duration, targetMin, targetMax, speechRatio, snrProxy)
 
         val suggestedStatus = when {
-            duration < HARD_MIN_DURATION || duration > HARD_MAX_DURATION -> ReviewStatus.RETAKE
+            duration < hardMin || duration > hardMax -> ReviewStatus.RETAKE
             clippingDetected && speechRatio < 0.15 -> ReviewStatus.RETAKE
             warnings.isEmpty() -> ReviewStatus.ACCEPTED
             else -> ReviewStatus.WARNING
@@ -78,10 +94,10 @@ object QualityAnalyzer {
         return QualityResult(duration, qualityScore, snrProxy, speechRatio, clippingDetected, suggestedStatus, warnings)
     }
 
-    private fun computeScore(clipping: Boolean, duration: Double, speechRatio: Double, snr: Double): Double {
+    private fun computeScore(clipping: Boolean, duration: Double, targetMin: Double, targetMax: Double, speechRatio: Double, snr: Double): Double {
         var score = 1.0
         if (clipping) score -= 0.4
-        if (duration < TARGET_MIN_DURATION || duration > TARGET_MAX_DURATION) score -= 0.15
+        if (duration < targetMin || duration > targetMax) score -= 0.15
         if (speechRatio < 0.25) score -= 0.25
         if (snr < 6.0) score -= 0.2
         return score.coerceIn(0.0, 1.0)

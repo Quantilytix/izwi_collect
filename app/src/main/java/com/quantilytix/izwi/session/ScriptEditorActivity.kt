@@ -18,6 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.quantilytix.izwi.IzwiApplication
 import com.quantilytix.izwi.databinding.ActivityScriptEditorBinding
+import com.quantilytix.izwi.recording.RecordingActivity
 import com.quantilytix.izwi.ui.applySystemBarInsetPadding
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -185,8 +186,17 @@ class ScriptEditorActivity : AppCompatActivity() {
             setTextColor(Color.parseColor("#6B7280"))
             textSize = 12.5f
         }
+        val recordAction = TextView(this).apply {
+            text = "  RECORD"
+            setTextColor(Color.parseColor("#1F6F5C"))
+            textSize = 12.5f
+            setTypeface(typeface, android.graphics.Typeface.BOLD)
+            setPadding(16, 0, 0, 0)
+            setOnClickListener { recordCategory(category) }
+        }
         labelRow.addView(label)
         labelRow.addView(count)
+        labelRow.addView(recordAction)
 
         val bar = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
             max = total.coerceAtLeast(1)
@@ -199,6 +209,17 @@ class ScriptEditorActivity : AppCompatActivity() {
         row.addView(labelRow)
         row.addView(bar)
         return row
+    }
+
+    /** Jumps straight into recording just this category's prompts. Needs an
+     * active session — this screen is also reachable before one starts, from
+     * session setup, where there is nothing yet to attach a recording to. */
+    private fun recordCategory(category: String) {
+        if (!SessionManager.hasActiveSession(this)) {
+            Toast.makeText(this, "Start a session first, then come back to record by category", Toast.LENGTH_LONG).show()
+            return
+        }
+        startActivity(RecordingActivity.intent(this, category))
     }
 
     private fun persistAndRefresh() {

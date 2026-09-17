@@ -44,6 +44,16 @@ object SessionManager {
         prefs(context).edit().putInt(KEY_PROMPT_INDEX, index).apply()
     }
 
+    /** Resume position within one category's own prompt subset, tracked
+     * separately per category so recording "just the stock category" for a
+     * while doesn't disturb the whole-script position, or vice versa. */
+    fun categoryPromptIndex(context: Context, category: String): Int =
+        prefs(context).getInt("prompt_index_cat_$category", 0)
+
+    fun setCategoryPromptIndex(context: Context, category: String, index: Int) {
+        prefs(context).edit().putInt("prompt_index_cat_$category", index).apply()
+    }
+
     fun clear(context: Context) {
         prefs(context).edit().clear().apply()
     }

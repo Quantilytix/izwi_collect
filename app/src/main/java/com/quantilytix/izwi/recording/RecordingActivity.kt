@@ -36,12 +36,21 @@ import java.util.UUID
 class RecordingActivity : AppCompatActivity() {
 
     companion object {
-        fun intent(context: Context) = Intent(context, RecordingActivity::class.java)
+        private const val EXTRA_CATEGORY = "category_filter"
+
+        /** [categoryFilter] narrows the session to just that category's
+         * prompts — e.g. "go record all the stock_inventory clips" — with
+         * its own resume position, independent of the whole-script order. */
+        fun intent(context: Context, categoryFilter: String? = null) =
+            Intent(context, RecordingActivity::class.java).apply {
+                if (!categoryFilter.isNullOrBlank()) putExtra(EXTRA_CATEGORY, categoryFilter)
+            }
     }
 
     private lateinit var binding: ActivityRecordingBinding
     private lateinit var repository: ScriptRepository
     private lateinit var prompts: MutableList<Prompt>
+    private var categoryFilter: String? = null
     private var index = 0
 
     private val recorder = WavRecorder()
@@ -80,8 +89,11 @@ class RecordingActivity : AppCompatActivity() {
         binding.root.applySystemBarInsetPadding(applyTop = true, applyBottom = true)
 
         repository = ScriptRepository(this)
-        prompts = repository.loadActive().toMutableList()
-        index = SessionManager.promptIndex(this)
+        categoryFilter = intent.getStringExtra(EXTRA_CATEGORY)
+        val allPrompts = repository.loadActive()
+        val filter = categoryFilter
+        prompts = (if (filter == null) allPrompts else allPrompts.filter { it.category == filter }).toMutableList()
+        index = if (filter == null) SessionManager.promptIndex(this) else SessionManager.categoryPromptIndex(this, filter)
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             requestMic.launch(Manifest.permission.RECORD_AUDIO)
@@ -119,8 +131,15 @@ class RecordingActivity : AppCompatActivity() {
             .setPositiveButton("Save") { _, _ ->
                 val text = input.text.toString().trim()
                 if (text.isNotEmpty()) {
-                    prompts[index] = p.copy(text = text)
-                    repository.saveActive(prompts, scriptVersion)
+                    val updated = p.copy(text = text)
+                    prompts[index] = updated
+                    // prompts may be a category-filtered subset — patch the one
+                    // prompt inside the full script rather than overwriting it
+                    // with just this subset.
+                    val fullScript = repository.loadActive().toMutableList()
+                    val fullIndex = fullScript.indexOfFirst { it.id == p.id }
+                    if (fullIndex >= 0) fullScript[fullIndex] = updated
+                    repository.saveActive(fullScript, scriptVersion)
                     binding.promptText.text = text
                 }
             }
@@ -196,7 +215,8 @@ class RecordingActivity : AppCompatActivity() {
         binding.retakeButton.isEnabled = true
 
         lifecycleScope.launch {
-            val result = withContext(Dispatchers.IO) { QualityAnalyzer.analyze(file) }
+            val isLongForm = prompts[index].category == "reports_and_insights"
+            val result = withContext(Dispatchers.IO) { QualityAnalyzer.analyze(file, isLongForm) }
             pendingQuality = result
             binding.acceptButton.isEnabled = true
             if (result.warnings.isNotEmpty()) {
@@ -312,7 +332,12 @@ class RecordingActivity : AppCompatActivity() {
         lifecycleScope.launch {
             app.database.clipDao().upsert(clip)
             index += 1
-            SessionManager.setPromptIndex(this@RecordingActivity, index)
+            val filter = categoryFilter
+            if (filter == null) {
+                SessionManager.setPromptIndex(this@RecordingActivity, index)
+            } else {
+                SessionManager.setCategoryPromptIndex(this@RecordingActivity, filter, index)
+            }
             showCurrentPrompt()
         }
     }
