@@ -48,12 +48,17 @@
         </LinearLayout>
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/categoryProgressContainer"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="12dp" />
+        android:layout_height="280dp">
+
+        <LinearLayout
+            android:id="@+id/categoryProgressContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp" />
+    </ScrollView>
 
     <View
         android:layout_width="match_parent"

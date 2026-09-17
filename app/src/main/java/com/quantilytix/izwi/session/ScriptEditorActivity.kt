@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -156,9 +157,16 @@ class ScriptEditorActivity : AppCompatActivity() {
     }
 
     private fun buildCategoryRow(category: String, recorded: Int, total: Int, isLeast: Boolean): LinearLayout {
+        val density = resources.displayMetrics.density
+        fun dp(v: Int) = (v * density).toInt()
+
         val row = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(0, 6, 0, 6)
+            setPadding(0, dp(8), 0, dp(8))
+        }
+        val labelRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
             isClickable = true
             isFocusable = true
             val outValue = android.util.TypedValue()
@@ -169,10 +177,6 @@ class ScriptEditorActivity : AppCompatActivity() {
                 refreshList()
                 binding.promptsRecycler.scrollToPosition(0)
             }
-        }
-        val labelRow = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
         }
         val label = TextView(this).apply {
             text = (if (isLeast) "↓ " else "") + category.replace('_', ' ').uppercase()
@@ -186,28 +190,39 @@ class ScriptEditorActivity : AppCompatActivity() {
             setTextColor(Color.parseColor("#6B7280"))
             textSize = 12.5f
         }
-        val recordAction = TextView(this).apply {
-            text = "  RECORD"
-            setTextColor(Color.parseColor("#1F6F5C"))
-            textSize = 12.5f
-            setTypeface(typeface, android.graphics.Typeface.BOLD)
-            setPadding(16, 0, 0, 0)
-            setOnClickListener { recordCategory(category) }
-        }
         labelRow.addView(label)
         labelRow.addView(count)
-        labelRow.addView(recordAction)
 
         val bar = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
             max = total.coerceAtLeast(1)
             progress = recorded.coerceAtMost(total)
-            layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 12).apply {
-                topMargin = 4
+            layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(6)).apply {
+                topMargin = dp(4)
+                bottomMargin = dp(4)
             }
+        }
+
+        // A real Button, not a small inline TextView — a prior version put
+        // "RECORD" as plain text next to the count, with a touch target
+        // under 15dp tall, well below Android's 48dp minimum, which is why
+        // taps on it weren't registering reliably.
+        val recordButton = Button(this).apply {
+            text = "Record this category"
+            isAllCaps = false
+            textSize = 13f
+            minimumHeight = dp(44)
+            setPadding(dp(16), dp(8), dp(16), dp(8))
+            setTextColor(Color.WHITE)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#1F6F5C"))
+            layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                topMargin = dp(2)
+            }
+            setOnClickListener { recordCategory(category) }
         }
 
         row.addView(labelRow)
         row.addView(bar)
+        row.addView(recordButton)
         return row
     }
 
