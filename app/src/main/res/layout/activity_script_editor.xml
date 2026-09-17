@@ -16,37 +16,57 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/sync_status_title"
+            android:text="Script"
             android:textColor="@android:color/white"
             android:textSize="20sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/queuedText"
+            android:id="@+id/promptCountText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:textColor="@android:color/white"
-            tools:text="18 accepted clips not yet uploaded" />
-
-        <TextView
-            android:id="@+id/lastSyncText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@android:color/white"
-            tools:text="Last successful sync: 2026-09-17T10:04:00Z" />
+            tools:text="40 prompts" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/syncNowButton"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:text="@string/sync_action"
-        android:backgroundTint="@color/izwi_accent" />
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <Button
+            android:id="@+id/addPromptButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textColor="@color/izwi_primary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Add prompt" />
+
+        <Button
+            android:id="@+id/importScriptButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textColor="@color/izwi_primary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Import file" />
+
+        <Button
+            android:id="@+id/resetScriptButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textColor="@color/izwi_warning"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Reset" />
+
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/batchesRecycler"
+        android:id="@+id/promptsRecycler"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"

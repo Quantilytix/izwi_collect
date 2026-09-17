@@ -19,6 +19,7 @@ import com.quantilytix.izwi.export.BatchExporter
 
 import com.quantilytix.izwi.export.UploadWorker
 import com.quantilytix.izwi.session.SessionManager
+import com.quantilytix.izwi.ui.applySystemBarInsetPadding
 import kotlinx.coroutines.launch
 
 class SyncStatusActivity : AppCompatActivity() {
@@ -33,6 +34,8 @@ class SyncStatusActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySyncStatusBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.headerContainer.applySystemBarInsetPadding(applyTop = true)
+        binding.batchesRecycler.applySystemBarInsetPadding(applyBottom = true)
 
         val app = application as IzwiApplication
         val sessionId = SessionManager.sessionId(this)

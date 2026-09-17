@@ -36,4 +36,10 @@ interface ClipDao {
 
     @Query("SELECT COUNT(*) FROM clips WHERE sessionId = :sessionId AND promptId = :promptId AND reviewStatus != 'retake'")
     suspend fun countAcceptedForPrompt(sessionId: String, promptId: String): Int
+
+    /** Cumulative usable audio for this speaker across every session, not
+     * just the one in progress — this is what the 2h-baseline / 5h meter on
+     * the review screen tracks. */
+    @Query("SELECT COALESCE(SUM(durationSeconds), 0.0) FROM clips WHERE speakerId = :speakerId AND reviewStatus IN ('accepted', 'warning')")
+    fun observeTotalDurationForSpeaker(speakerId: String): Flow<Double>
 }

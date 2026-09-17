@@ -28,6 +28,7 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".session.ScriptEditorActivity" android:exported="false" />
         <activity android:name=".recording.RecordingActivity" android:exported="false" />
         <activity android:name=".review.ReviewQueueActivity" android:exported="false" />
         <activity android:name=".sync.SyncStatusActivity" android:exported="false" />

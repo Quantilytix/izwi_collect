@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/headerContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -25,8 +27,22 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:textColor="@android:color/white"
-            tools:text="Accepted 10 · Warning 2 · Retake 1 · Skipped 3 — 4.2 min"
-            xmlns:tools="http://schemas.android.com/tools" />
+            tools:text="Accepted 10 · Warning 2 · Retake 1 · Skipped 3 — 4.2 min" />
+
+        <TextView
+            android:id="@+id/overallProgressText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            tools:text="Overall for this speaker: 46 / 300 min — 74 min to the 2h baseline" />
+
+        <com.quantilytix.izwi.review.SessionMeterView
+            android:id="@+id/overallProgressMeter"
+            android:layout_width="match_parent"
+            android:layout_height="14dp"
+            android:layout_marginTop="6dp" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

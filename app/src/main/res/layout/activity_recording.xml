@@ -14,13 +14,30 @@
         android:textColor="@color/izwi_muted"
         tools:text="12 / 40" />
 
-    <TextView
-        android:id="@+id/categoryText"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/izwi_accent"
-        android:textStyle="bold"
-        android:layout_marginTop="4dp" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/categoryText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/izwi_accent"
+            android:textStyle="bold"
+            android:layout_marginTop="4dp" />
+
+        <Button
+            android:id="@+id/editPromptButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textColor="@color/izwi_primary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Edit prompt" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/promptText"

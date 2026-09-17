@@ -26,6 +26,7 @@ import com.quantilytix.izwi.review.ReviewQueueActivity
 import com.quantilytix.izwi.session.Prompt
 import com.quantilytix.izwi.session.ScriptRepository
 import com.quantilytix.izwi.session.SessionManager
+import com.quantilytix.izwi.ui.applySystemBarInsetPadding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -39,7 +40,8 @@ class RecordingActivity : AppCompatActivity() {
     }
 
     private lateinit var binding: ActivityRecordingBinding
-    private lateinit var prompts: List<Prompt>
+    private lateinit var repository: ScriptRepository
+    private lateinit var prompts: MutableList<Prompt>
     private var index = 0
 
     private val recorder = WavRecorder()
@@ -75,8 +77,10 @@ class RecordingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityRecordingBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.root.applySystemBarInsetPadding(applyTop = true, applyBottom = true)
 
-        prompts = ScriptRepository(this).load()
+        repository = ScriptRepository(this)
+        prompts = repository.loadActive().toMutableList()
         index = SessionManager.promptIndex(this)
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
@@ -94,6 +98,31 @@ class RecordingActivity : AppCompatActivity() {
         binding.skipButton.setOnClickListener { promptSkipReason() }
         binding.acceptButton.setOnClickListener { acceptAndNext() }
         binding.finishSessionButton.setOnClickListener { goToReview() }
+        binding.editPromptButton.setOnClickListener { editCurrentPrompt() }
+    }
+
+    /**
+     * Fixes wording (grammar, formality) on the upcoming prompt before it's
+     * read aloud. Only available while no take is in progress — editing a
+     * prompt after recording it belongs in the review queue, where changing
+     * the transcript to no longer match the spoken audio forces a retake.
+     */
+    private fun editCurrentPrompt() {
+        val p = prompts[index]
+        val input = EditText(this).apply { setText(p.text) }
+        AlertDialog.Builder(this)
+            .setTitle("Edit prompt")
+            .setView(input)
+            .setPositiveButton("Save") { _, _ ->
+                val text = input.text.toString().trim()
+                if (text.isNotEmpty()) {
+                    prompts[index] = p.copy(text = text)
+                    repository.saveActive(prompts, scriptVersion)
+                    binding.promptText.text = text
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun showCurrentPrompt() {
@@ -121,6 +150,7 @@ class RecordingActivity : AppCompatActivity() {
         binding.retakeButton.isEnabled = false
         binding.acceptButton.isEnabled = false
         binding.skipButton.isEnabled = true
+        binding.editPromptButton.isEnabled = true
         binding.warningText.visibility = android.view.View.GONE
     }
 
@@ -141,6 +171,7 @@ class RecordingActivity : AppCompatActivity() {
         isRecording = true
         binding.recordButton.text = getString(com.quantilytix.izwi.R.string.recording_stop)
         binding.skipButton.isEnabled = false
+        binding.editPromptButton.isEnabled = false
         elapsedStartMs = System.currentTimeMillis()
         elapsedHandler.post(elapsedRunnable)
     }

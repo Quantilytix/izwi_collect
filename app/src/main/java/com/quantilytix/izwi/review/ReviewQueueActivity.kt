@@ -15,6 +15,7 @@ import com.quantilytix.izwi.data.ReviewStatus
 import com.quantilytix.izwi.databinding.ActivityReviewQueueBinding
 import com.quantilytix.izwi.session.SessionManager
 import com.quantilytix.izwi.sync.SyncStatusActivity
+import com.quantilytix.izwi.ui.applySystemBarInsetPadding
 import kotlinx.coroutines.launch
 
 class ReviewQueueActivity : AppCompatActivity() {
@@ -30,6 +31,8 @@ class ReviewQueueActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityReviewQueueBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.headerContainer.applySystemBarInsetPadding(applyTop = true)
+        binding.proceedToSyncButton.applySystemBarInsetPadding(applyBottom = true)
 
         val app = application as IzwiApplication
         val sessionId = SessionManager.sessionId(this)
@@ -49,8 +52,35 @@ class ReviewQueueActivity : AppCompatActivity() {
             }
         }
 
+        val speakerId = SessionManager.speakerId(this)
+        lifecycleScope.launch {
+            app.database.clipDao().observeTotalDurationForSpeaker(speakerId).collect { totalSeconds ->
+                updateOverallProgress(totalSeconds / 60.0)
+            }
+        }
+
         binding.proceedToSyncButton.setOnClickListener {
             startActivity(SyncStatusActivity.intent(this))
+        }
+    }
+
+    private fun updateOverallProgress(totalMinutes: Double) {
+        val baselineMinutes = 120.0
+        val scaleMinutes = 300.0
+        binding.overallProgressMeter.baselineMinutes = baselineMinutes
+        binding.overallProgressMeter.scaleMinutes = scaleMinutes
+        binding.overallProgressMeter.progressMinutes = totalMinutes
+
+        binding.overallProgressText.text = if (totalMinutes < baselineMinutes) {
+            String.format(
+                "Overall for this speaker: %.0f / %.0f min — %.0f min to the 2h baseline",
+                totalMinutes, scaleMinutes, baselineMinutes - totalMinutes,
+            )
+        } else {
+            String.format(
+                "Overall for this speaker: %.0f / %.0f min — 2h baseline reached, keep going",
+                totalMinutes, scaleMinutes,
+            )
         }
     }
 
@@ -76,15 +106,37 @@ class ReviewQueueActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Fixing a prompt's wording belongs on the recording screen, before it's
+     * spoken. Editing a transcript here, after audio already exists, means
+     * the text no longer certainly matches what was recorded — so it always
+     * forces a retake rather than silently keeping an accepted/warning
+     * status against changed text. Skipped clips have no audio to mismatch,
+     * so their transcript can be corrected freely.
+     */
     private fun editTranscript(clip: ClipEntity) {
         val input = EditText(this).apply { setText(clip.transcript) }
         AlertDialog.Builder(this)
             .setTitle("Correct transcript")
             .setView(input)
             .setPositiveButton("Save") { _, _ ->
+                val newTranscript = input.text.toString()
+                val forcesRetake = clip.filePath != null && clip.reviewStatus != ReviewStatus.RETAKE
                 val app = application as IzwiApplication
                 lifecycleScope.launch {
-                    app.database.clipDao().update(clip.copy(transcript = input.text.toString()))
+                    app.database.clipDao().update(
+                        clip.copy(
+                            transcript = newTranscript,
+                            reviewStatus = if (clip.filePath != null) ReviewStatus.RETAKE else clip.reviewStatus,
+                        )
+                    )
+                    if (forcesRetake) {
+                        android.widget.Toast.makeText(
+                            this@ReviewQueueActivity,
+                            "Transcript changed — marked for retake so audio and text match",
+                            android.widget.Toast.LENGTH_LONG,
+                        ).show()
+                    }
                 }
             }
             .setNegativeButton("Cancel", null)

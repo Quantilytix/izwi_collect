@@ -43,4 +43,13 @@
         android:text="@string/consent_continue"
         android:backgroundTint="@color/izwi_primary" />
 
+    <Button
+        android:id="@+id/manageScriptButton"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:textColor="@color/izwi_primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Manage script" />
+
 </LinearLayout>

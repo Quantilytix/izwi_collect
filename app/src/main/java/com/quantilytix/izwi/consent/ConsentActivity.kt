@@ -11,6 +11,7 @@ import com.quantilytix.izwi.databinding.ActivityConsentBinding
 import com.quantilytix.izwi.recording.RecordingActivity
 import com.quantilytix.izwi.session.ScriptRepository
 import com.quantilytix.izwi.session.SessionManager
+import com.quantilytix.izwi.ui.applySystemBarInsetPadding
 import kotlinx.coroutines.launch
 
 class ConsentActivity : AppCompatActivity() {
@@ -21,6 +22,7 @@ class ConsentActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityConsentBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.root.applySystemBarInsetPadding(applyTop = true, applyBottom = true)
 
         if (SessionManager.hasActiveSession(this)) {
             startActivity(RecordingActivity.intent(this))
@@ -39,7 +41,7 @@ class ConsentActivity : AppCompatActivity() {
         binding.startSessionButton.setOnClickListener {
             val speakerId = binding.speakerIdInput.text.toString().trim()
             val consentVersion = getString(R.string.consent_version)
-            val scriptVersion = ScriptRepository(this).scriptVersion()
+            val scriptVersion = ScriptRepository(this).activeScriptVersion()
 
             val sessionId = SessionManager.startNewSession(this, speakerId, consentVersion, scriptVersion)
 
