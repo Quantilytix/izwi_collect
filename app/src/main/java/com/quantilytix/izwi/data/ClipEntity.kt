@@ -30,6 +30,9 @@ data class ClipEntity(
     val speakerId: String,
     val sessionId: String,
     val promptId: String,
+    /** Not part of the relay's manifest.csv contract — app-internal only,
+     * used to break down recording progress per script category. */
+    val category: String,
     val language: String,
     val transcript: String,
     val sampleRate: Int,

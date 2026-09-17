@@ -99,6 +99,9 @@ class RecordingActivity : AppCompatActivity() {
         binding.acceptButton.setOnClickListener { acceptAndNext() }
         binding.finishSessionButton.setOnClickListener { goToReview() }
         binding.editPromptButton.setOnClickListener { editCurrentPrompt() }
+        binding.scriptProgressButton.setOnClickListener {
+            startActivity(com.quantilytix.izwi.session.ScriptEditorActivity.intent(this, speakerId))
+        }
     }
 
     /**
@@ -241,6 +244,7 @@ class RecordingActivity : AppCompatActivity() {
             speakerId = speakerId,
             sessionId = sessionId,
             promptId = p.id,
+            category = p.category,
             language = "sn",
             transcript = p.text,
             sampleRate = 0,
@@ -272,6 +276,7 @@ class RecordingActivity : AppCompatActivity() {
                 speakerId = speakerId,
                 sessionId = sessionId,
                 promptId = p.id,
+                category = p.category,
                 language = "sn",
                 transcript = p.text,
                 sampleRate = recorder.sampleRate,

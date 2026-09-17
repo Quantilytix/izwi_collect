@@ -32,7 +32,7 @@ class SessionSetupActivity : AppCompatActivity() {
         binding.root.applySystemBarInsetPadding(applyTop = true, applyBottom = true)
 
         binding.manageScriptButton.setOnClickListener {
-            startActivity(ScriptEditorActivity.intent(this))
+            startActivity(ScriptEditorActivity.intent(this, binding.speakerIdInput.text.toString().trim()))
         }
 
         if (SessionManager.hasActiveSession(this)) {

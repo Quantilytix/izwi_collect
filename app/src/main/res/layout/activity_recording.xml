@@ -127,13 +127,31 @@
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/finishSessionButton"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Review queue"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/finishSessionButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginTop="8dp"
+            android:text="Review queue"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:textColor="@color/izwi_primary" />
+
+        <Button
+            android:id="@+id/scriptProgressButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginTop="8dp"
+            android:text="Script progress"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textColor="@color/izwi_primary" />
+
+    </LinearLayout>
 
 </LinearLayout>

@@ -59,6 +59,10 @@ class ReviewQueueActivity : AppCompatActivity() {
             }
         }
 
+        binding.scriptProgressLink.setOnClickListener {
+            startActivity(com.quantilytix.izwi.session.ScriptEditorActivity.intent(this, speakerId))
+        }
+
         binding.proceedToSyncButton.setOnClickListener {
             startActivity(SyncStatusActivity.intent(this))
         }

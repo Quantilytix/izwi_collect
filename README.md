@@ -26,7 +26,7 @@ Consent to corpus, end to end.
 | Stage | What | Where |
 |---|---|---|
 | Session setup | Speaker ID, session ID, script version | `SessionSetupActivity.kt` (consent-gated `ConsentActivity.kt` kept for later) |
-| Script | Add, edit, delete, or import prompts; every change persists immediately | `ScriptEditorActivity.kt`, `ScriptRepository.kt` |
+| Script | Add, edit, delete, or import prompts; per-category recorded/total progress (least-recorded category surfaces first, tap to jump straight to it); every change persists immediately | `ScriptEditorActivity.kt`, `ScriptRepository.kt` |
 | Recording | Mono PCM WAV, 24 kHz preferred, 16 kHz fallback, live level meter, edit-prompt-before-recording | `WavRecorder.kt`, `LevelMeterView.kt`, `RecordingActivity.kt` |
 | Quality checks | Clipping, excessive silence, loudness, duration, background-noise proxy — warns, never deletes | `QualityAnalyzer.kt` |
 | Review queue | Transcript correction (forces a retake, since edited text stops matching recorded audio), accept/retake toggle, session summary, cumulative 2h-baseline/5h meter | `ReviewQueueActivity.kt`, `SessionMeterView.kt` |
@@ -48,7 +48,7 @@ A second device pass caught three more issues, also fixed: the review queue and 
 
 ## Android: from consent to corpus
 
-**Session setup** takes a speaker ID and starts a session; it resumes safely if the app restarts mid-session, and links to **Script** for adding, editing, deleting, or importing prompts before a session starts. **Recording** shows one prompt at a time with a live level meter, replay, retake, skip-with-reason, and an Edit prompt action for fixing wording before it's read aloud. **Review** lets you fix a transcript (which forces a retake, since the audio no longer certainly matches) or flag a clip for retake, and shows a cumulative meter of this speaker's total recorded time against a 2-hour baseline — recording is meant to continue well past it, not stop there. **Sync** is a single explicit action — nothing uploads on its own — and shows the resulting pull request URL once the relay accepts a batch.
+**Session setup** takes a speaker ID and starts a session; it resumes safely if the app restarts mid-session, and links to **Script** for adding, editing, deleting, or importing prompts. **Script** is also reachable mid-session from the recording screen and the review queue — not just before you start — and shows recorded/total progress per category, least-recorded first, so it's obvious what still needs coverage. Tapping a category jumps straight to its prompts instead of scrolling through thousands of them. **Recording** shows one prompt at a time with a live level meter, replay, retake, skip-with-reason, and an Edit prompt action for fixing wording before it's read aloud. **Review** lets you fix a transcript (which forces a retake, since the audio no longer certainly matches) or flag a clip for retake, and shows a cumulative meter of this speaker's total recorded time against a 2-hour baseline — recording is meant to continue well past it, not stop there. **Sync** is a single explicit action — nothing uploads on its own — and shows the resulting pull request URL once the relay accepts a batch.
 
 A one-page printable guide for the speaker is in [`docs/onboarding`](docs/onboarding/Izwi_Recording_Voice.pdf).
 

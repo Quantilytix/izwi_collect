@@ -3,32 +3,48 @@ package com.quantilytix.izwi.session
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import android.view.Gravity
+import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.quantilytix.izwi.IzwiApplication
 import com.quantilytix.izwi.databinding.ActivityScriptEditorBinding
 import com.quantilytix.izwi.ui.applySystemBarInsetPadding
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 /**
- * Lets a speaker or reviewer fix wording (grammar, formality) or bring
- * their own script before a session starts. Every change is persisted
- * immediately via ScriptRepository.saveActive — there is no separate save
- * step to forget.
+ * Lets a speaker or reviewer fix wording (grammar, formality), bring their
+ * own script, or check recording progress per category — reachable from
+ * session setup, the recording screen, and the review queue, not just
+ * documented in onboarding. Every script edit persists immediately via
+ * ScriptRepository.saveActive — there is no separate save step to forget.
  */
 class ScriptEditorActivity : AppCompatActivity() {
 
     companion object {
-        fun intent(context: Context) = Intent(context, ScriptEditorActivity::class.java)
+        private const val EXTRA_SPEAKER_ID = "speaker_id"
+        fun intent(context: Context, speakerId: String? = null) =
+            Intent(context, ScriptEditorActivity::class.java).apply {
+                if (!speakerId.isNullOrBlank()) putExtra(EXTRA_SPEAKER_ID, speakerId)
+            }
     }
 
     private lateinit var binding: ActivityScriptEditorBinding
     private lateinit var repository: ScriptRepository
     private lateinit var adapter: PromptAdapter
     private var prompts: MutableList<Prompt> = mutableListOf()
+    private var speakerId: String = ""
+    private var categoryFilter: String? = null
 
     private val importLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri == null) return@registerForActivityResult
@@ -39,6 +55,7 @@ class ScriptEditorActivity : AppCompatActivity() {
                 return@registerForActivityResult
             }
             prompts = imported.toMutableList()
+            categoryFilter = null
             persistAndRefresh()
             Toast.makeText(this, "Imported ${imported.size} prompts", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
@@ -53,12 +70,15 @@ class ScriptEditorActivity : AppCompatActivity() {
         binding.headerContainer.applySystemBarInsetPadding(applyTop = true)
         binding.promptsRecycler.applySystemBarInsetPadding(applyBottom = true)
 
+        speakerId = intent.getStringExtra(EXTRA_SPEAKER_ID)?.takeIf { it.isNotBlank() }
+            ?: SessionManager.speakerId(this)
+
         repository = ScriptRepository(this)
         prompts = repository.loadActive().toMutableList()
 
         adapter = PromptAdapter(
-            onEdit = { position, prompt -> editPrompt(position, prompt) },
-            onDelete = { position, _ -> deletePrompt(position) },
+            onEdit = { _, prompt -> editPrompt(prompt) },
+            onDelete = { _, prompt -> deletePrompt(prompt) },
         )
         binding.promptsRecycler.layoutManager = LinearLayoutManager(this)
         binding.promptsRecycler.adapter = adapter
@@ -69,11 +89,116 @@ class ScriptEditorActivity : AppCompatActivity() {
             importLauncher.launch(arrayOf("*/*"))
         }
         binding.resetScriptButton.setOnClickListener { resetToDefault() }
+        binding.clearFilterButton.setOnClickListener {
+            categoryFilter = null
+            refreshList()
+        }
+
+        if (speakerId.isNotBlank()) {
+            val app = application as IzwiApplication
+            lifecycleScope.launch {
+                app.database.clipDao().observeCategoryCountsForSpeaker(speakerId).collect { counts ->
+                    renderCategoryProgress(counts.associate { it.category to it.count })
+                }
+            }
+        } else {
+            renderCategoryProgress(emptyMap())
+        }
     }
 
     private fun refreshList() {
-        adapter.submit(prompts)
-        binding.promptCountText.text = "${prompts.size} prompts" + if (repository.hasCustomScript()) " (custom)" else ""
+        val filter = categoryFilter
+        val visible = if (filter == null) prompts else prompts.filter { it.category == filter }
+        adapter.submit(visible)
+
+        binding.promptCountText.text = if (filter == null) {
+            "${prompts.size} prompts" + if (repository.hasCustomScript()) " (custom)" else ""
+        } else {
+            "${visible.size} / ${prompts.size} prompts — ${filter.replace('_', ' ').uppercase()} only"
+        }
+        binding.clearFilterButton.visibility = if (filter == null) android.view.View.GONE else android.view.View.VISIBLE
+
+        renderCategoryProgress(lastCounts)
+    }
+
+    private var lastCounts: Map<String, Int> = emptyMap()
+
+    private fun renderCategoryProgress(recordedByCategory: Map<String, Int>) {
+        lastCounts = recordedByCategory
+        val container = binding.categoryProgressContainer
+        container.removeAllViews()
+
+        val totalByCategory = prompts.groupingBy { it.category }.eachCount()
+        if (totalByCategory.isEmpty()) return
+
+        val rows = totalByCategory.map { (category, total) ->
+            val recorded = recordedByCategory[category] ?: 0
+            Triple(category, recorded, total)
+        }.sortedBy { it.second }
+
+        val title = TextView(this).apply {
+            text = if (speakerId.isBlank()) {
+                "Progress by category (enter a speaker ID to see this)"
+            } else {
+                "Progress by category for $speakerId — least-recorded first"
+            }
+            setTextColor(Color.parseColor("#6B7280"))
+            textSize = 12f
+            setPadding(0, 0, 0, 8)
+        }
+        container.addView(title)
+
+        rows.forEachIndexed { i, (category, recorded, total) ->
+            val isLeast = i == 0 && recorded < total
+            container.addView(buildCategoryRow(category, recorded, total, isLeast))
+        }
+    }
+
+    private fun buildCategoryRow(category: String, recorded: Int, total: Int, isLeast: Boolean): LinearLayout {
+        val row = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(0, 6, 0, 6)
+            isClickable = true
+            isFocusable = true
+            val outValue = android.util.TypedValue()
+            theme.resolveAttribute(android.R.attr.selectableItemBackground, outValue, true)
+            setBackgroundResource(outValue.resourceId)
+            setOnClickListener {
+                categoryFilter = category
+                refreshList()
+                binding.promptsRecycler.scrollToPosition(0)
+            }
+        }
+        val labelRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        val label = TextView(this).apply {
+            text = (if (isLeast) "↓ " else "") + category.replace('_', ' ').uppercase()
+            setTextColor(if (isLeast) Color.parseColor("#C0392B") else Color.parseColor("#14231F"))
+            textSize = 12.5f
+            setTypeface(typeface, if (isLeast) android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL)
+            layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
+        }
+        val count = TextView(this).apply {
+            text = "$recorded / $total"
+            setTextColor(Color.parseColor("#6B7280"))
+            textSize = 12.5f
+        }
+        labelRow.addView(label)
+        labelRow.addView(count)
+
+        val bar = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
+            max = total.coerceAtLeast(1)
+            progress = recorded.coerceAtMost(total)
+            layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 12).apply {
+                topMargin = 4
+            }
+        }
+
+        row.addView(labelRow)
+        row.addView(bar)
+        return row
     }
 
     private fun persistAndRefresh() {
@@ -97,14 +222,15 @@ class ScriptEditorActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun editPrompt(position: Int, prompt: Prompt) {
+    private fun editPrompt(prompt: Prompt) {
         val input = EditText(this).apply { setText(prompt.text) }
         AlertDialog.Builder(this)
             .setTitle("Edit prompt")
             .setView(input)
             .setPositiveButton("Save") { _, _ ->
                 val text = input.text.toString().trim()
-                if (text.isNotEmpty()) {
+                val position = prompts.indexOfFirst { it.id == prompt.id }
+                if (text.isNotEmpty() && position >= 0) {
                     prompts[position] = prompt.copy(text = text)
                     persistAndRefresh()
                 }
@@ -113,11 +239,11 @@ class ScriptEditorActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun deletePrompt(position: Int) {
+    private fun deletePrompt(prompt: Prompt) {
         AlertDialog.Builder(this)
             .setTitle("Delete this prompt?")
             .setPositiveButton("Delete") { _, _ ->
-                prompts.removeAt(position)
+                prompts.removeAll { it.id == prompt.id }
                 persistAndRefresh()
             }
             .setNegativeButton("Cancel", null)
@@ -131,6 +257,7 @@ class ScriptEditorActivity : AppCompatActivity() {
             .setPositiveButton("Reset") { _, _ ->
                 repository.resetToDefault()
                 prompts = repository.loadActive().toMutableList()
+                categoryFilter = null
                 refreshList()
             }
             .setNegativeButton("Cancel", null)

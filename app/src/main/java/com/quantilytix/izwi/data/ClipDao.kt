@@ -42,4 +42,16 @@ interface ClipDao {
      * the review screen tracks. */
     @Query("SELECT COALESCE(SUM(durationSeconds), 0.0) FROM clips WHERE speakerId = :speakerId AND reviewStatus IN ('accepted', 'warning')")
     fun observeTotalDurationForSpeaker(speakerId: String): Flow<Double>
+
+    /** Recorded-clip counts per script category for this speaker, across
+     * every session — the script screen uses this against each category's
+     * prompt count to surface which category still needs the most takes. */
+    @Query(
+        "SELECT category, COUNT(*) as count FROM clips " +
+            "WHERE speakerId = :speakerId AND reviewStatus IN ('accepted', 'warning') " +
+            "GROUP BY category"
+    )
+    fun observeCategoryCountsForSpeaker(speakerId: String): Flow<List<CategoryCount>>
 }
+
+data class CategoryCount(val category: String, val count: Int)
