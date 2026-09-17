@@ -1,7 +1,7 @@
 # Izwi
 
-[![Download the APK](https://img.shields.io/badge/download-Izwi%20APK-1F6F5C?style=for-the-badge)](https://github.com/Quantilytix/izwi/releases/latest/download/app-debug.apk)
-[![Latest release](https://img.shields.io/github/v/release/Quantilytix/izwi?style=for-the-badge&label=latest&color=14231F)](https://github.com/Quantilytix/izwi/releases/latest)
+[![Download the APK](https://img.shields.io/badge/download-Izwi%20APK-1F6F5C?style=for-the-badge)](https://github.com/Quantilytix/izwi_collect/releases/latest/download/app-debug.apk)
+[![Latest release](https://img.shields.io/github/v/release/Quantilytix/izwi_collect?style=for-the-badge&label=latest&color=14231F)](https://github.com/Quantilytix/izwi_collect/releases/latest)
 
 `izwi` is Shona for "voice." Offline-first capture of Smart-Q's production Shona voice, recorded from a single consented speaker in Zimbabwe. Sibling of [Injini](https://github.com/rapha18th/injini), Smart-Q's acoustic-monitoring app, and built on the same field-tested pattern: record offline, review before anything leaves the phone, sync only when told to, stage every upload as a pull request, let a person merge it.
 
