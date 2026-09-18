@@ -1,7 +1,7 @@
 {
   "script_version": "v2-draft",
   "language": "sn",
-  "note": "DRAFT SCRIPT, MACHINE-GENERATED. Most of this is combinatorial: a small set of carrier-phrase templates (validated in v1's original 40 prompts) filled in with varying numbers, names, places, items, days, and times, which is a legitimate way to reach broad coverage for those slots but still means the underlying grammar has not been checked by a native Shona speaker. The natural-conversation, confirmation, error, and mixed-terms categories are hand-written, not templated, and carry the same caveat. reports_and_insights is deliberately longer-form (multi-sentence paragraphs, not short carrier phrases) because that's what Smart-Qx's TTS actually reads aloud in production -- narrated sales/stock/cash-flow reports and a grounded coaching insight (see smart-w/utility.py narrate_for_tts and _grounded_sales_insight) -- so this category needs the most scrutiny of all of them: longer text compounds any grammar issue. Sized for roughly 5+ hours of reading material overall so a speaker can keep recording past the 2-hour baseline the app tracks, without running out of prompts. A native Shona speaker should review and prune this before it drives a real session -- treat volume as a ceiling to draw from, not a quota to complete.",
+  "note": "DRAFT SCRIPT, MACHINE-GENERATED. Scope (2026-09-18): every prompt here is something Smart-Qx's TTS itself would say back to a user -- a confirmation, a report, a reminder, a warning, a proactive notification -- never a question posed TO the bot, a request for it to repeat itself, or human-to-human conversation. An earlier revision included confirmations_clarifications and natural_conversation categories modeled on what a USER might say; both were removed after user feedback that this isn't the current training target. PLAN_B_officer_voice_capture_app.md still lists both as eventual coverage -- this is a deferral, not a permanent cut. Most of what remains is combinatorial: a small set of carrier-phrase templates (validated in v1's original 40 prompts) filled in with varying numbers, names, places, items, days, and times, which is a legitimate way to reach broad coverage for those slots but still means the underlying grammar has not been checked by a native Shona speaker. reports_and_insights is deliberately longer-form (multi-sentence paragraphs, not short carrier phrases) because that's what Smart-Qx's TTS actually reads aloud in production -- narrated sales/stock/cash-flow reports and a grounded coaching insight (see smart-w/utility.py narrate_for_tts and _grounded_sales_insight) -- and is the category to prioritise recording, per the user: it's the closest match to real production output, so it needs the most scrutiny of all of them too, since longer text compounds any grammar issue. A native Shona speaker should review and prune this before it drives a real session -- treat volume as a ceiling to draw from, not a quota to complete.",
   "prompts": [
     {
       "id": "sales_expense_replies_0001",
@@ -30384,81 +30384,6 @@
       "text": "Mari yapfuura yega yega yabhizimisi vhiki rino ndeye madhora chiuru. Izvi zvinoratidza budiriro huru."
     },
     {
-      "id": "confirmations_clarifications_0001",
-      "category": "confirmations_clarifications",
-      "text": "Ndazvinzwisisa, tichaita saizvozvo."
-    },
-    {
-      "id": "confirmations_clarifications_0002",
-      "category": "confirmations_clarifications",
-      "text": "Ndapota dzokororai zvamataura."
-    },
-    {
-      "id": "confirmations_clarifications_0003",
-      "category": "confirmations_clarifications",
-      "text": "Chokwadi here kuti mutengo ndiwoyu?"
-    },
-    {
-      "id": "confirmations_clarifications_0004",
-      "category": "confirmations_clarifications",
-      "text": "Hongu, zvose zvaita saizvozvo."
-    },
-    {
-      "id": "confirmations_clarifications_0005",
-      "category": "confirmations_clarifications",
-      "text": "Kwete, ndapota tsanangurai zvakare."
-    },
-    {
-      "id": "confirmations_clarifications_0006",
-      "category": "confirmations_clarifications",
-      "text": "Ndinotenda nekutsanangura kwenyu."
-    },
-    {
-      "id": "confirmations_clarifications_0007",
-      "category": "confirmations_clarifications",
-      "text": "Ndapota nditaurirei zvakare, handina kunzwisisa."
-    },
-    {
-      "id": "confirmations_clarifications_0008",
-      "category": "confirmations_clarifications",
-      "text": "Zvamataura ndizvo here chaizvo?"
-    },
-    {
-      "id": "confirmations_clarifications_0009",
-      "category": "confirmations_clarifications",
-      "text": "Tinobvumirana pamusoro peizvi."
-    },
-    {
-      "id": "confirmations_clarifications_0010",
-      "category": "confirmations_clarifications",
-      "text": "Ndapota simbisai bvumirano iyi."
-    },
-    {
-      "id": "confirmations_clarifications_0011",
-      "category": "confirmations_clarifications",
-      "text": "Ndatenda, ndazvinzwisisa zvakanaka."
-    },
-    {
-      "id": "confirmations_clarifications_0012",
-      "category": "confirmations_clarifications",
-      "text": "Handisati ndanzwisisa, dzokororai zvishoma."
-    },
-    {
-      "id": "confirmations_clarifications_0013",
-      "category": "confirmations_clarifications",
-      "text": "Zvirinani kuti musimbise izvi mumavara."
-    },
-    {
-      "id": "confirmations_clarifications_0014",
-      "category": "confirmations_clarifications",
-      "text": "Ndine chokwadi kuti ndizvo zvamataura."
-    },
-    {
-      "id": "confirmations_clarifications_0015",
-      "category": "confirmations_clarifications",
-      "text": "Tichaita hurukuro yekusimbisa mangwana."
-    },
-    {
       "id": "errors_apologies_warnings_0001",
       "category": "errors_apologies_warnings",
       "text": "Ndine urombo, pane chakanganisika pano."
@@ -30534,84 +30459,9 @@
       "text": "Ndapota bvunzai mumwe mushandi kana pane dambudziko."
     },
     {
-      "id": "natural_conversation_0001",
-      "category": "natural_conversation",
-      "text": "Makadii nhasi, mabasa ari kufamba sei?"
-    },
-    {
-      "id": "natural_conversation_0002",
-      "category": "natural_conversation",
-      "text": "Ndatenda nekuuya kwenyu nhasi uno."
-    },
-    {
-      "id": "natural_conversation_0003",
-      "category": "natural_conversation",
-      "text": "Tichaonana zvakare mangwana masikati."
-    },
-    {
-      "id": "natural_conversation_0004",
-      "category": "natural_conversation",
-      "text": "Zvinhu zviri kufamba zvakanaka kwazvo."
-    },
-    {
-      "id": "natural_conversation_0005",
-      "category": "natural_conversation",
-      "text": "Ndine mubvunzo mumwe chete kwauri."
-    },
-    {
-      "id": "natural_conversation_0006",
-      "category": "natural_conversation",
-      "text": "Mangwanani akanaka, ndeipi nyaya yanhasi?"
-    },
-    {
-      "id": "natural_conversation_0007",
-      "category": "natural_conversation",
-      "text": "Ndafara kukuonai zvakare mangwana."
-    },
-    {
-      "id": "natural_conversation_0008",
-      "category": "natural_conversation",
-      "text": "Basa riri kufamba zvakanaka here?"
-    },
-    {
-      "id": "natural_conversation_0009",
-      "category": "natural_conversation",
-      "text": "Ndaswera zvangu, imi maswerasei?"
-    },
-    {
-      "id": "natural_conversation_0010",
-      "category": "natural_conversation",
-      "text": "Tine zvakawanda zvekuita nhasi."
-    },
-    {
-      "id": "natural_conversation_0011",
-      "category": "natural_conversation",
-      "text": "Ndinoda kuongorora mabasa edu enhasi."
-    },
-    {
-      "id": "natural_conversation_0012",
-      "category": "natural_conversation",
-      "text": "Zvakanaka, tichaenderera mberi nebasa."
-    },
-    {
-      "id": "natural_conversation_0013",
-      "category": "natural_conversation",
-      "text": "Ngatitangei basa redu remangwanani."
-    },
-    {
-      "id": "natural_conversation_0014",
-      "category": "natural_conversation",
-      "text": "Ndinofara kushanda nemi nhasi."
-    },
-    {
-      "id": "natural_conversation_0015",
-      "category": "natural_conversation",
-      "text": "Tine nguva shoma, ngatikurumidzei."
-    },
-    {
       "id": "shona_english_business_terms_0001",
       "category": "shona_english_business_terms",
-      "text": "Tinofanira kuisa invoice muSmart-Q nhasi."
+      "text": "Invoice yenyu yaiswa muSmart-Q nhasi."
     },
     {
       "id": "shona_english_business_terms_0002",
@@ -30636,7 +30486,7 @@
     {
       "id": "shona_english_business_terms_0006",
       "category": "shona_english_business_terms",
-      "text": "Tinofanira kuupdater stock muSmart-Q."
+      "text": "Stock yenyu yaupdatwa muSmart-Q."
     },
     {
       "id": "shona_english_business_terms_0007",
@@ -30661,7 +30511,7 @@
     {
       "id": "shona_english_business_terms_0011",
       "category": "shona_english_business_terms",
-      "text": "Tinoda kuverify payment iyi nekukurumidza."
+      "text": "Payment yenyu iri kuverifiwa nekukurumidza."
     },
     {
       "id": "shona_english_business_terms_0012",
