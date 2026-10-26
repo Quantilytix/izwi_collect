@@ -13,6 +13,7 @@ import com.quantilytix.izwi.IzwiApplication
 import com.quantilytix.izwi.data.ClipEntity
 import com.quantilytix.izwi.data.ReviewStatus
 import com.quantilytix.izwi.databinding.ActivityReviewQueueBinding
+import com.quantilytix.izwi.recording.RecordingActivity
 import com.quantilytix.izwi.session.SessionManager
 import com.quantilytix.izwi.sync.SyncStatusActivity
 import com.quantilytix.izwi.ui.applySystemBarInsetPadding
@@ -140,6 +141,7 @@ class ReviewQueueActivity : AppCompatActivity() {
                             "Transcript changed — marked for retake so audio and text match",
                             android.widget.Toast.LENGTH_LONG,
                         ).show()
+                        openRetake(clip.copy(transcript = newTranscript))
                     }
                 }
             }
@@ -152,7 +154,15 @@ class ReviewQueueActivity : AppCompatActivity() {
         val app = application as IzwiApplication
         lifecycleScope.launch {
             app.database.clipDao().update(clip.copy(reviewStatus = newStatus))
+            if (newStatus == ReviewStatus.RETAKE) openRetake(clip)
         }
+    }
+
+    /** Marking a clip retake used to only flip its status, leaving the
+     * speaker to find the prompt again by hand. This opens the recorder
+     * straight on that prompt; accepting the new take returns here. */
+    private fun openRetake(clip: ClipEntity) {
+        startActivity(RecordingActivity.retakeIntent(this, clip.promptId, clip.category, clip.transcript))
     }
 
     override fun onDestroy() {

@@ -9,10 +9,14 @@ import java.util.UUID
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
-private val MANIFEST_HEADER = listOf(
+// prompt_id and category were added in v0.6.0 and go last on purpose: the
+// sixteen columns before them keep their names and order, so a reader that
+// indexes columns by position still works.
+internal val MANIFEST_HEADER = listOf(
     "clip_id", "speaker_id", "session_id", "language", "transcript", "sample_rate",
     "duration_seconds", "quality_score", "snr_proxy", "speech_ratio", "clipping_detected",
     "recorded_at_utc", "device_model", "consent_version", "script_version", "review_status",
+    "prompt_id", "category",
 )
 
 /** Bounded upload batches of ~20-30 minutes, per PLAN_B Phase 5 — a full raw
@@ -88,7 +92,7 @@ object BatchExporter {
         } else value
     }
 
-    private fun buildManifestCsv(clips: List<ClipEntity>): String {
+    internal fun buildManifestCsv(clips: List<ClipEntity>): String {
         val sb = StringBuilder()
         sb.append(MANIFEST_HEADER.joinToString(",")).append("\n")
         for (c in clips) {
@@ -97,13 +101,14 @@ object BatchExporter {
                 c.sampleRate.toString(), c.durationSeconds.toString(), c.qualityScore.toString(),
                 c.snrProxy.toString(), c.speechRatio.toString(), c.clippingDetected.toString(),
                 c.recordedAtUtc, c.deviceModel, c.consentVersion, c.scriptVersion, c.reviewStatus,
+                c.promptId, c.category,
             )
             sb.append(row.joinToString(",") { csvEscape(it) }).append("\n")
         }
         return sb.toString()
     }
 
-    private fun buildMetadataJsonl(clips: List<ClipEntity>): String {
+    internal fun buildMetadataJsonl(clips: List<ClipEntity>): String {
         val sb = StringBuilder()
         for (c in clips) {
             val obj = JSONObject()
@@ -123,6 +128,8 @@ object BatchExporter {
             obj.put("consent_version", c.consentVersion)
             obj.put("script_version", c.scriptVersion)
             obj.put("review_status", c.reviewStatus)
+            obj.put("prompt_id", c.promptId)
+            obj.put("category", c.category)
             sb.append(obj.toString()).append("\n")
         }
         return sb.toString()

@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.WindowManager
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -37,6 +38,13 @@ class RecordingActivity : AppCompatActivity() {
 
     companion object {
         private const val EXTRA_CATEGORY = "category_filter"
+        private const val EXTRA_RETAKE_PROMPT_ID = "retake_prompt_id"
+        private const val EXTRA_RETAKE_CATEGORY = "retake_category"
+        private const val EXTRA_RETAKE_TEXT = "retake_text"
+
+        // Free-form takes are flagged past 180s; stopping a forgotten take at
+        // 300s keeps the file small enough for QualityAnalyzer to load whole.
+        private const val MAX_TAKE_SECONDS = 300.0
 
         /** [categoryFilter] narrows the session to just that category's
          * prompts — e.g. "go record all the stock_inventory clips" — with
@@ -45,6 +53,18 @@ class RecordingActivity : AppCompatActivity() {
             Intent(context, RecordingActivity::class.java).apply {
                 if (!categoryFilter.isNullOrBlank()) putExtra(EXTRA_CATEGORY, categoryFilter)
             }
+
+        /** Opens the recorder on one prompt only, for a clip marked retake in
+         * the review queue. [text] is the clip's transcript, so a transcript
+         * corrected in review is what gets read. Accepting or skipping
+         * returns to the review queue, and the saved script positions stay
+         * where they were. */
+        fun retakeIntent(context: Context, promptId: String, category: String, text: String) =
+            Intent(context, RecordingActivity::class.java).apply {
+                putExtra(EXTRA_RETAKE_PROMPT_ID, promptId)
+                putExtra(EXTRA_RETAKE_CATEGORY, category)
+                putExtra(EXTRA_RETAKE_TEXT, text)
+            }
     }
 
     private lateinit var binding: ActivityRecordingBinding
@@ -52,6 +72,8 @@ class RecordingActivity : AppCompatActivity() {
     private lateinit var prompts: MutableList<Prompt>
     private var categoryFilter: String? = null
     private var index = 0
+    private var isRetakeMode = false
+    private var promptHasTake = false
 
     private val recorder = WavRecorder()
     private var currentWavFile: File? = null
@@ -66,6 +88,11 @@ class RecordingActivity : AppCompatActivity() {
         override fun run() {
             val seconds = (System.currentTimeMillis() - elapsedStartMs) / 1000.0
             binding.elapsedTimeText.text = String.format("%.1fs", seconds)
+            if (seconds >= MAX_TAKE_SECONDS) {
+                stopRecording()
+                Toast.makeText(this@RecordingActivity, "Take stopped at 5 minutes", Toast.LENGTH_LONG).show()
+                return
+            }
             elapsedHandler.postDelayed(this, 100)
         }
     }
@@ -89,11 +116,25 @@ class RecordingActivity : AppCompatActivity() {
         binding.root.applySystemBarInsetPadding(applyTop = true, applyBottom = true)
 
         repository = ScriptRepository(this)
-        categoryFilter = intent.getStringExtra(EXTRA_CATEGORY)
-        val allPrompts = repository.loadActive()
-        val filter = categoryFilter
-        prompts = (if (filter == null) allPrompts else allPrompts.filter { it.category == filter }).toMutableList()
-        index = if (filter == null) SessionManager.promptIndex(this) else SessionManager.categoryPromptIndex(this, filter)
+        val retakePromptId = intent.getStringExtra(EXTRA_RETAKE_PROMPT_ID)
+        if (retakePromptId != null) {
+            isRetakeMode = true
+            prompts = mutableListOf(
+                Prompt(
+                    id = retakePromptId,
+                    category = intent.getStringExtra(EXTRA_RETAKE_CATEGORY) ?: "custom",
+                    text = intent.getStringExtra(EXTRA_RETAKE_TEXT) ?: "",
+                )
+            )
+            index = 0
+            binding.backButton.visibility = android.view.View.GONE
+        } else {
+            categoryFilter = intent.getStringExtra(EXTRA_CATEGORY)
+            val allPrompts = repository.loadActive()
+            val filter = categoryFilter
+            prompts = (if (filter == null) allPrompts else allPrompts.filter { it.category == filter }).toMutableList()
+            index = if (filter == null) SessionManager.promptIndex(this) else SessionManager.categoryPromptIndex(this, filter)
+        }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             requestMic.launch(Manifest.permission.RECORD_AUDIO)
@@ -107,7 +148,8 @@ class RecordingActivity : AppCompatActivity() {
         binding.recordButton.setOnClickListener { if (isRecording) stopRecording() else startRecording() }
         binding.replayButton.setOnClickListener { replay() }
         binding.retakeButton.setOnClickListener { retake() }
-        binding.skipButton.setOnClickListener { promptSkipReason() }
+        binding.skipButton.setOnClickListener { if (promptHasTake) advance() else promptSkipReason() }
+        binding.backButton.setOnClickListener { goBack() }
         binding.acceptButton.setOnClickListener { acceptAndNext() }
         binding.finishSessionButton.setOnClickListener { goToReview() }
         binding.editPromptButton.setOnClickListener { editCurrentPrompt() }
@@ -149,17 +191,64 @@ class RecordingActivity : AppCompatActivity() {
 
     private fun showCurrentPrompt() {
         if (index >= prompts.size) {
+            showFinished()
             goToReview()
             return
         }
         val p = prompts[index]
-        binding.progressText.text = "${index + 1} / ${prompts.size}"
+        binding.progressText.text = if (isRetakeMode) "Retake" else "${index + 1} / ${prompts.size}"
         binding.categoryText.text = p.category.replace('_', ' ')
         binding.promptText.text = p.text
         binding.elapsedTimeText.text = "0.0s"
         binding.warningText.visibility = android.view.View.GONE
         binding.levelMeter.clear()
         resetTakeState()
+        refreshExistingTake(p)
+    }
+
+    /** Past the last prompt only Back and the review queue stay usable, so
+     * nothing can be recorded or skipped against a prompt that is not there. */
+    private fun showFinished() {
+        // The last take is already saved; forget it so Back is not blocked.
+        currentWavFile = null
+        currentClipId = null
+        pendingQuality = null
+        binding.progressText.text = "${prompts.size} / ${prompts.size}"
+        binding.promptText.text = "All prompts here are done"
+        binding.recordButton.isEnabled = false
+        binding.replayButton.isEnabled = false
+        binding.retakeButton.isEnabled = false
+        binding.acceptButton.isEnabled = false
+        binding.skipButton.isEnabled = false
+        binding.editPromptButton.isEnabled = false
+        binding.backButton.isEnabled = !isRetakeMode && prompts.isNotEmpty()
+    }
+
+    /** A prompt reached with Back, or already recorded in another pass of
+     * this session, has a take: Skip then reads Next and moves on without
+     * writing a skip record. */
+    private fun refreshExistingTake(prompt: Prompt) {
+        promptHasTake = false
+        binding.skipButton.text = getString(com.quantilytix.izwi.R.string.recording_skip)
+        if (isRetakeMode) return
+        val app = application as IzwiApplication
+        lifecycleScope.launch {
+            val count = app.database.clipDao().countAcceptedForPrompt(sessionId, prompt.id)
+            if (prompts.getOrNull(index)?.id != prompt.id) return@launch
+            promptHasTake = count > 0
+            binding.skipButton.text = getString(
+                if (promptHasTake) com.quantilytix.izwi.R.string.recording_next else com.quantilytix.izwi.R.string.recording_skip
+            )
+        }
+    }
+
+    /** Steps back one prompt to redo it. Only offered between takes, so an
+     * unsaved take is never dropped by it. */
+    private fun goBack() {
+        if (isRetakeMode || isRecording || currentWavFile != null || index <= 0) return
+        index = minOf(index, prompts.size) - 1
+        saveIndex()
+        showCurrentPrompt()
     }
 
     private fun resetTakeState() {
@@ -173,6 +262,7 @@ class RecordingActivity : AppCompatActivity() {
         binding.acceptButton.isEnabled = false
         binding.skipButton.isEnabled = true
         binding.editPromptButton.isEnabled = true
+        binding.backButton.isEnabled = !isRetakeMode && index > 0
         binding.warningText.visibility = android.view.View.GONE
     }
 
@@ -191,9 +281,14 @@ class RecordingActivity : AppCompatActivity() {
         recorder.start(file)
 
         isRecording = true
+        // A two-minute free-form take outlasts a typical screen timeout, and
+        // once the screen sleeps Android 9+ can feed a backgrounded app
+        // silence from the microphone.
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         binding.recordButton.text = getString(com.quantilytix.izwi.R.string.recording_stop)
         binding.skipButton.isEnabled = false
         binding.editPromptButton.isEnabled = false
+        binding.backButton.isEnabled = false
         elapsedStartMs = System.currentTimeMillis()
         elapsedHandler.post(elapsedRunnable)
     }
@@ -201,6 +296,7 @@ class RecordingActivity : AppCompatActivity() {
     private fun stopRecording() {
         val file = recorder.stop()
         isRecording = false
+        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         elapsedHandler.removeCallbacks(elapsedRunnable)
         binding.recordButton.text = getString(com.quantilytix.izwi.R.string.recording_record)
         binding.recordButton.isEnabled = true
@@ -215,8 +311,8 @@ class RecordingActivity : AppCompatActivity() {
         binding.retakeButton.isEnabled = true
 
         lifecycleScope.launch {
-            val isLongForm = prompts[index].category == "reports_and_insights"
-            val result = withContext(Dispatchers.IO) { QualityAnalyzer.analyze(file, isLongForm) }
+            val bounds = QualityAnalyzer.boundsForCategory(prompts[index].category)
+            val result = withContext(Dispatchers.IO) { QualityAnalyzer.analyze(file, bounds) }
             pendingQuality = result
             binding.acceptButton.isEnabled = true
             if (result.warnings.isNotEmpty()) {
@@ -312,7 +408,14 @@ class RecordingActivity : AppCompatActivity() {
                 reviewStatus = status,
                 filePath = file.absolutePath,
             )
-            persistAndAdvance(clip)
+            // Disabled until the next prompt shows, so a double tap cannot
+            // save twice and jump a prompt.
+            binding.acceptButton.isEnabled = false
+            binding.retakeButton.isEnabled = false
+            replaceEarlierTakesThenPersist(clip) {
+                binding.acceptButton.isEnabled = true
+                binding.retakeButton.isEnabled = true
+            }
         }
 
         if (quality.suggestedStatus == ReviewStatus.RETAKE) {
@@ -327,28 +430,76 @@ class RecordingActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * A redo after Back leaves an earlier usable take of the same prompt in
+     * this session. If no upload batch has claimed it yet, the speaker picks:
+     * Replace marks the earlier take retake (its audio stays on the device
+     * and the review queue can restore it), Keep both saves alongside it.
+     * Dismissing the dialog saves nothing and keeps the take pending.
+     */
+    private fun replaceEarlierTakesThenPersist(clip: ClipEntity, onCancelled: () -> Unit) {
+        val dao = (application as IzwiApplication).database.clipDao()
+        lifecycleScope.launch {
+            val earlier = dao.getUnbatchedTakesForPrompt(sessionId, clip.promptId)
+            if (earlier.isEmpty()) {
+                persistAndAdvance(clip)
+                return@launch
+            }
+            AlertDialog.Builder(this@RecordingActivity)
+                .setTitle("Replace the earlier take?")
+                .setMessage("This prompt already has a take in this session. Replace marks it for retake; its audio stays on the device.")
+                .setPositiveButton("Replace") { _, _ ->
+                    lifecycleScope.launch {
+                        for (old in earlier) dao.update(old.copy(reviewStatus = ReviewStatus.RETAKE))
+                        persistAndAdvance(clip)
+                    }
+                }
+                .setNegativeButton("Keep both") { _, _ -> persistAndAdvance(clip) }
+                .setOnCancelListener { onCancelled() }
+                .show()
+        }
+    }
+
     private fun persistAndAdvance(clip: ClipEntity) {
         val app = application as IzwiApplication
         lifecycleScope.launch {
             app.database.clipDao().upsert(clip)
-            index += 1
-            val filter = categoryFilter
-            if (filter == null) {
-                SessionManager.setPromptIndex(this@RecordingActivity, index)
-            } else {
-                SessionManager.setCategoryPromptIndex(this@RecordingActivity, filter, index)
-            }
-            showCurrentPrompt()
+            advance()
+        }
+    }
+
+    private fun advance() {
+        index += 1
+        saveIndex()
+        showCurrentPrompt()
+    }
+
+    /** Retake mode never moves the saved positions: it works on one prompt
+     * outside the script order. */
+    private fun saveIndex() {
+        if (isRetakeMode) return
+        val filter = categoryFilter
+        if (filter == null) {
+            SessionManager.setPromptIndex(this, index)
+        } else {
+            SessionManager.setCategoryPromptIndex(this, filter, index)
         }
     }
 
     private fun goToReview() {
+        // A retake was opened from the review queue, so returning to it means
+        // finishing here instead of stacking a second review screen on top.
+        if (isRetakeMode) {
+            finish()
+            return
+        }
         startActivity(ReviewQueueActivity.intent(this))
     }
 
     override fun onDestroy() {
         super.onDestroy()
         elapsedHandler.removeCallbacks(elapsedRunnable)
+        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         mediaPlayer?.release()
         if (isRecording) recorder.cancel()
     }

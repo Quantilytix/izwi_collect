@@ -110,6 +110,14 @@
         android:layout_marginTop="8dp">
 
         <Button
+            android:id="@+id/backButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:enabled="false"
+            android:text="@string/recording_back" />
+
+        <Button
             android:id="@+id/skipButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -120,7 +128,7 @@
             android:id="@+id/acceptButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:enabled="false"
             android:text="@string/recording_accept"
             android:backgroundTint="@color/izwi_accent" />

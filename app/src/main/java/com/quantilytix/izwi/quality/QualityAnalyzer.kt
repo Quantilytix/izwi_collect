@@ -17,6 +17,15 @@ data class QualityResult(
     val warnings: List<String>,
 )
 
+/** Duration ranges for one kind of take: inside target is normal, outside
+ * target only warns, and outside the hard bounds suggests a retake. */
+data class DurationBounds(
+    val targetMin: Double,
+    val targetMax: Double,
+    val hardMin: Double,
+    val hardMax: Double,
+)
+
 /**
  * Lightweight on-device checks from PLAN_B Phase 4: clipping, excessive
  * silence, loudness, duration, and a background-noise proxy. These only
@@ -24,28 +33,35 @@ data class QualityResult(
  */
 object QualityAnalyzer {
 
-    private const val TARGET_MIN_DURATION = 3.0
-    private const val TARGET_MAX_DURATION = 8.0
-    private const val HARD_MIN_DURATION = 1.0
-    private const val HARD_MAX_DURATION = 15.0
+    val SHORT_BOUNDS = DurationBounds(targetMin = 3.0, targetMax = 8.0, hardMin = 1.0, hardMax = 15.0)
 
     // reports_and_insights prompts are deliberately multi-sentence spoken
     // paragraphs, not short carrier phrases — the ordinary 3-8s/1-15s
     // ranges would flag every one of them as needing a forced retake.
-    private const val LONGFORM_TARGET_MIN_DURATION = 10.0
-    private const val LONGFORM_TARGET_MAX_DURATION = 35.0
-    private const val LONGFORM_HARD_MIN_DURATION = 4.0
-    private const val LONGFORM_HARD_MAX_DURATION = 60.0
+    val LONGFORM_BOUNDS = DurationBounds(targetMin = 10.0, targetMax = 35.0, hardMin = 4.0, hardMax = 60.0)
+
+    // Cue-card and own-words takes are spoken freely for 30 to 120 seconds
+    // (PLAN_AUDRY_VOICE.md, free-form speech). Segmentation into training
+    // clips happens on the server, so a long take is the normal case here.
+    val FREE_FORM_BOUNDS = DurationBounds(targetMin = 20.0, targetMax = 120.0, hardMin = 3.0, hardMax = 180.0)
+
+    /** Free-form categories are any whose name starts with "free_form"
+     * (free_form_cue_card, free_form_read_back, ...) plus "own_words". */
+    fun boundsForCategory(category: String): DurationBounds = when {
+        category.startsWith("free_form") || category == "own_words" -> FREE_FORM_BOUNDS
+        category == "reports_and_insights" -> LONGFORM_BOUNDS
+        else -> SHORT_BOUNDS
+    }
 
     private const val CLIPPING_SAMPLE_THRESHOLD = 32700
     private const val CLIPPING_FRACTION_LIMIT = 0.001
     private const val SILENCE_RMS_THRESHOLD = 300.0
 
-    fun analyze(wavFile: File, isLongForm: Boolean = false): QualityResult {
-        val targetMin = if (isLongForm) LONGFORM_TARGET_MIN_DURATION else TARGET_MIN_DURATION
-        val targetMax = if (isLongForm) LONGFORM_TARGET_MAX_DURATION else TARGET_MAX_DURATION
-        val hardMin = if (isLongForm) LONGFORM_HARD_MIN_DURATION else HARD_MIN_DURATION
-        val hardMax = if (isLongForm) LONGFORM_HARD_MAX_DURATION else HARD_MAX_DURATION
+    fun analyze(wavFile: File, bounds: DurationBounds = SHORT_BOUNDS): QualityResult {
+        val targetMin = bounds.targetMin
+        val targetMax = bounds.targetMax
+        val hardMin = bounds.hardMin
+        val hardMax = bounds.hardMax
 
         val samples = readPcm16(wavFile)
         val sampleRate = readSampleRate(wavFile)
@@ -116,14 +132,16 @@ object QualityAnalyzer {
         }
     }
 
+    // Reads straight past the 44-byte header instead of copying the data
+    // chunk first: a 180s free-form take at 24 kHz is about 8.6 MB, and the
+    // extra copy would have held a third full-size buffer on the heap.
     private fun readPcm16(file: File): ShortArray {
         val bytes = file.readBytes()
         if (bytes.size <= 44) return ShortArray(0)
-        val dataBytes = bytes.copyOfRange(44, bytes.size)
-        val samples = ShortArray(dataBytes.size / 2)
+        val samples = ShortArray((bytes.size - 44) / 2)
         for (i in samples.indices) {
-            val lo = dataBytes[i * 2].toInt() and 0xFF
-            val hi = dataBytes[i * 2 + 1].toInt()
+            val lo = bytes[44 + i * 2].toInt() and 0xFF
+            val hi = bytes[44 + i * 2 + 1].toInt()
             samples[i] = ((hi shl 8) or lo).toShort()
         }
         return samples

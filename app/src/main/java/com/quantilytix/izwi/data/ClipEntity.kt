@@ -30,8 +30,8 @@ data class ClipEntity(
     val speakerId: String,
     val sessionId: String,
     val promptId: String,
-    /** Not part of the relay's manifest.csv contract — app-internal only,
-     * used to break down recording progress per script category. */
+    /** Breaks down recording progress per script category. Since v0.6.0 it
+     * is also exported, with promptId, as the last two manifest.csv columns. */
     val category: String,
     val language: String,
     val transcript: String,

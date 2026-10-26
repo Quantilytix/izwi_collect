@@ -27,8 +27,8 @@ android {
         applicationId = "com.quantilytix.izwi"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1"
+        versionCode = 6
+        versionName = "0.6.0"
 
         buildConfigField("String", "RELAY_BASE_URL", "\"$relayBaseUrl\"")
         buildConfigField("String", "RELAY_API_KEY", "\"$relayApiKey\"")
@@ -72,5 +72,8 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     testImplementation("junit:junit:4.13.2")
+    // Local unit tests see only android.jar stubs; this is the real org.json
+    // so BatchExporterTest can read back the metadata.jsonl it builds.
+    testImplementation("org.json:json:20240303")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
 }

@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.room.withTransaction
 import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.quantilytix.izwi.IzwiApplication
@@ -139,10 +140,17 @@ class SyncStatusActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Used by Sync now and by the Retry button on a failed batch. Unique work
+     * keyed by batch id with KEEP means a batch already queued, running or
+     * waiting out a retry backoff is never uploaded a second time in
+     * parallel; a finished (failed) attempt is replaced, so Retry still
+     * works once the earlier attempt has ended.
+     */
     private fun enqueueUpload(batchId: String) {
         val request = OneTimeWorkRequestBuilder<UploadWorker>()
             .setInputData(Data.Builder().putString(UploadWorker.KEY_BATCH_ID, batchId).build())
             .build()
-        WorkManager.getInstance(this).enqueue(request)
+        WorkManager.getInstance(this).enqueueUniqueWork("upload_$batchId", ExistingWorkPolicy.KEEP, request)
     }
 }

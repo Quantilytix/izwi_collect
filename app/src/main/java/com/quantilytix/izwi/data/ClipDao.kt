@@ -37,6 +37,14 @@ interface ClipDao {
     @Query("SELECT COUNT(*) FROM clips WHERE sessionId = :sessionId AND promptId = :promptId AND reviewStatus != 'retake'")
     suspend fun countAcceptedForPrompt(sessionId: String, promptId: String): Int
 
+    /** Earlier usable takes of one prompt in this session that no upload
+     * batch has claimed yet, so a redo after Back can still replace them. */
+    @Query(
+        "SELECT * FROM clips WHERE sessionId = :sessionId AND promptId = :promptId " +
+            "AND reviewStatus IN ('accepted', 'warning') AND batchId IS NULL"
+    )
+    suspend fun getUnbatchedTakesForPrompt(sessionId: String, promptId: String): List<ClipEntity>
+
     /** Cumulative usable audio for this speaker across every session, not
      * just the one in progress — this is what the 2h-baseline / 5h meter on
      * the review screen tracks. */
