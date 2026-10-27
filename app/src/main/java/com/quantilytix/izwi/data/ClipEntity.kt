@@ -1,5 +1,6 @@
 package com.quantilytix.izwi.data
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -31,7 +32,7 @@ data class ClipEntity(
     val sessionId: String,
     val promptId: String,
     /** Breaks down recording progress per script category. Since v0.6.0 it
-     * is also exported, with promptId, as the last two manifest.csv columns. */
+     * is also exported, after promptId, as a manifest.csv column. */
     val category: String,
     val language: String,
     val transcript: String,
@@ -50,4 +51,9 @@ data class ClipEntity(
     val filePath: String? = null,
     val batchId: String? = null,
     val uploadStatus: String = UploadStatus.PENDING,
+    /** The prompt's text version when this take was recorded (v0.7.0). An
+     * edit bumps the prompt's version, so a take whose version differs from
+     * the prompt's current one was read from older text. Rows from before
+     * v0.7.0 migrate to 1, the version every prompt starts at. */
+    @ColumnInfo(defaultValue = "1") val promptVersion: Int = 1,
 )

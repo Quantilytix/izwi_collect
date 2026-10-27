@@ -9,6 +9,7 @@ import com.quantilytix.izwi.R
 import com.quantilytix.izwi.data.ConsentRecordEntity
 import com.quantilytix.izwi.databinding.ActivityConsentBinding
 import com.quantilytix.izwi.recording.RecordingActivity
+import com.quantilytix.izwi.session.Languages
 import com.quantilytix.izwi.session.ScriptRepository
 import com.quantilytix.izwi.session.SessionManager
 import com.quantilytix.izwi.ui.applySystemBarInsetPadding
@@ -41,7 +42,7 @@ class ConsentActivity : AppCompatActivity() {
         binding.startSessionButton.setOnClickListener {
             val speakerId = binding.speakerIdInput.text.toString().trim()
             val consentVersion = getString(R.string.consent_version)
-            val scriptVersion = ScriptRepository(this).activeScriptVersion()
+            val scriptVersion = ScriptRepository(this).activeScriptVersion(Languages.SHONA)
 
             val sessionId = SessionManager.startNewSession(this, speakerId, consentVersion, scriptVersion)
 

@@ -110,7 +110,8 @@ class SyncStatusActivity : AppCompatActivity() {
                     if (unbatched.isEmpty()) {
                         emptyList()
                     } else {
-                        BatchChunker.chunkByDuration(unbatched).map { chunk ->
+                        // One language per batch, then bounded by duration.
+                        BatchChunker.chunkByLanguageAndDuration(unbatched).map { chunk ->
                             val batchId = BatchExporter.newBatchId()
                             app.database.clipDao().assignBatch(chunk.map { it.clipId }, batchId, UploadStatus.QUEUED)
                             batchId to chunk

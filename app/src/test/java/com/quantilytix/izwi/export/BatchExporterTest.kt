@@ -34,13 +34,14 @@ class BatchExporterTest {
         consentVersion = "v1",
         scriptVersion = "v3",
         reviewStatus = ReviewStatus.ACCEPTED,
+        promptVersion = 2,
     )
 
     @Test
-    fun manifestKeepsLegacyColumnsAndAppendsPromptIdAndCategory() {
+    fun manifestKeepsEarlierColumnsAndAppendsPromptVersionLast() {
         val lines = BatchExporter.buildManifestCsv(listOf(clip)).trimEnd().lines()
         val header = lines[0].split(",")
-        assertEquals(legacyColumns + listOf("prompt_id", "category"), header)
+        assertEquals(legacyColumns + listOf("prompt_id", "category", "prompt_version"), header)
 
         val row = lines[1].split(",")
         assertEquals(header.size, row.size)
@@ -48,13 +49,35 @@ class BatchExporterTest {
         assertEquals("accepted", row[15])
         assertEquals("cue_007", row[16])
         assertEquals("free_form_cue_card", row[17])
+        assertEquals("2", row[18])
     }
 
     @Test
-    fun metadataCarriesPromptIdAndCategory() {
+    fun metadataCarriesPromptIdCategoryAndVersion() {
         val obj = JSONObject(BatchExporter.buildMetadataJsonl(listOf(clip)).trimEnd())
         assertEquals("cue_007", obj.getString("prompt_id"))
         assertEquals("free_form_cue_card", obj.getString("category"))
+        assertEquals(2, obj.getInt("prompt_version"))
         assertEquals("clip_abc", obj.getString("clip_id"))
+    }
+
+    @Test
+    fun takesFromBeforeV070ExportPromptVersionOne() {
+        val old = clip.copy(promptVersion = 1)
+        assertEquals("1", BatchExporter.buildManifestCsv(listOf(old)).trimEnd().lines()[1].split(",").last())
+    }
+
+    @Test
+    fun aBatchNeverMixesLanguages() {
+        val sn1 = clip.copy(clipId = "sn1", language = "sn", durationSeconds = 600.0)
+        val nd1 = clip.copy(clipId = "nd1", language = "nd", durationSeconds = 600.0)
+        val sn2 = clip.copy(clipId = "sn2", language = "sn", durationSeconds = 600.0)
+        val sn3 = clip.copy(clipId = "sn3", language = "sn", durationSeconds = 600.0)
+        val nd2 = clip.copy(clipId = "nd2", language = "nd", durationSeconds = 60.0)
+
+        val batches = BatchChunker.chunkByLanguageAndDuration(listOf(sn1, nd1, sn2, sn3, nd2))
+        for (batch in batches) assertEquals(1, batch.map { it.language }.toSet().size)
+        // Shona first (it appears first), still bounded at about 25 minutes.
+        assertEquals(listOf(listOf("sn1", "sn2"), listOf("sn3"), listOf("nd1", "nd2")), batches.map { b -> b.map { it.clipId } })
     }
 }

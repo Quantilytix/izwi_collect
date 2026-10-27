@@ -3,100 +3,64 @@ package com.quantilytix.izwi.session
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
-import org.json.JSONArray
-import org.json.JSONObject
+import android.provider.OpenableColumns
 import java.io.File
-import java.util.UUID
-
-data class Prompt(val id: String, val category: String, val text: String)
 
 /**
- * Loads the recording script. Prefers a persisted, user-editable active
- * script over the bundled seed asset — recording sessions always read
- * through [loadActive] / [activeScriptVersion] so an in-app fix or an
- * imported script takes effect without a rebuild.
+ * The recording scripts, one active pack per language. Each language picks
+ * from its bundled packs or an imported file, and every edit lands in that
+ * pack's own edited copy, so an in-app fix takes effect without a rebuild
+ * and switching packs never loses it. Recording sessions always read
+ * through [loadActiveScript] / [activeScriptVersion].
+ *
+ * Reads and writes parse or rewrite a whole script (6,106 prompts for the
+ * read script), so screens call these off the main thread where they can.
  */
 class ScriptRepository(private val context: Context) {
 
-    private val activeScriptFile: File
-        get() = File(File(context.filesDir, "scripts").apply { mkdirs() }, "active_script.json")
+    private val store = ScriptStore(
+        root = File(context.filesDir, "scripts"),
+        readAsset = { name -> context.assets.open(name).bufferedReader().use { it.readText() } },
+        // First run after v0.6.0: its single script is now the Shona slot,
+        // and the saved recording positions move with it.
+        onLegacyAdopted = { shonaPackId -> SessionManager.adoptLegacyPositions(context, shonaPackId) },
+    )
 
-    fun loadActive(): List<Prompt> {
-        val file = activeScriptFile
-        return if (file.exists()) {
-            parse(file.readText())
-        } else {
-            load()
-        }
-    }
+    fun packs(language: String): List<ScriptPack> = store.packs(language)
 
-    fun activeScriptVersion(): String {
-        val file = activeScriptFile
-        return if (file.exists()) {
-            JSONObject(file.readText()).optString("script_version", "custom")
-        } else {
-            scriptVersion()
-        }
-    }
+    fun activePack(language: String): ScriptPack = store.activePack(language)
 
-    fun hasCustomScript(): Boolean = activeScriptFile.exists()
+    fun setActivePack(language: String, packId: String): Boolean = store.setActivePack(language, packId)
 
-    fun saveActive(prompts: List<Prompt>, scriptVersion: String = "custom") {
-        val root = JSONObject()
-        root.put("script_version", scriptVersion)
-        root.put("language", "sn")
-        val array = JSONArray()
-        for (p in prompts) {
-            val obj = JSONObject()
-            obj.put("id", p.id)
-            obj.put("category", p.category)
-            obj.put("text", p.text)
-            array.put(obj)
-        }
-        root.put("prompts", array)
-        activeScriptFile.writeText(root.toString(2))
-    }
+    fun hasEdits(pack: ScriptPack): Boolean = store.hasEdits(pack)
 
-    fun resetToDefault() {
-        activeScriptFile.delete()
-    }
+    fun loadActiveScript(language: String): ActiveScript = store.load(language)
+
+    fun loadActive(language: String): List<Prompt> = store.load(language).prompts
+
+    fun activeScriptVersion(language: String): String = store.load(language).scriptVersion
+
+    /** The one save path for prompt text: the Prompts screen and the
+     * recorder's Edit prompt both call this. See [ScriptStore.editText]. */
+    fun editPromptText(language: String, promptId: String, text: String): Prompt? =
+        store.editText(language, promptId, text, SessionManager.nowUtcIso())
+
+    fun addPrompt(language: String, text: String): Prompt? = store.addPrompt(language, text)
+
+    fun deletePrompt(language: String, promptId: String) = store.deletePrompt(language, promptId)
+
+    fun resetActivePack(language: String): Boolean = store.resetActivePack(language, SessionManager.nowUtcIso())
 
     /** Accepts either the app's own JSON script schema or a plain text file
-     * with one prompt per line — whichever a speaker or reviewer finds
-     * easier to hand-edit outside the app. */
-    fun importScript(uri: Uri, contentResolver: ContentResolver): List<Prompt> {
+     * with one prompt per line, whichever a speaker or reviewer finds
+     * easier to hand-edit outside the app. The file becomes a new pack for
+     * [language] and its active one. */
+    fun importScript(language: String, uri: Uri, contentResolver: ContentResolver): ScriptPack? {
         val text = contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
             ?: error("could not read the selected file")
-        return try {
-            parse(text)
-        } catch (e: Exception) {
-            text.lines()
-                .map { it.trim() }
-                .filter { it.isNotEmpty() }
-                .mapIndexed { i, line -> Prompt(id = "custom_${i + 1}", category = "custom", text = line) }
+        val name = contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) cursor.getString(0) else null
         }
-    }
-
-    private fun parse(json: String): List<Prompt> {
-        val root = JSONObject(json)
-        val array = root.getJSONArray("prompts")
-        return (0 until array.length()).map { i ->
-            val obj = array.getJSONObject(i)
-            Prompt(
-                id = obj.optString("id", "custom_${UUID.randomUUID().toString().take(8)}"),
-                category = obj.optString("category", "custom"),
-                text = obj.getString("text"),
-            )
-        }
-    }
-
-    private fun load(assetName: String = "script_v1.json"): List<Prompt> {
-        val json = context.assets.open(assetName).bufferedReader().use { it.readText() }
-        return parse(json)
-    }
-
-    private fun scriptVersion(assetName: String = "script_v1.json"): String {
-        val json = context.assets.open(assetName).bufferedReader().use { it.readText() }
-        return JSONObject(json).optString("script_version", "v1")
+        return store.importScript(language, text, name, System.currentTimeMillis())
     }
 }

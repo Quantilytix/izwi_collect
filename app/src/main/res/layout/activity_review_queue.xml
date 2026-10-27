@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:textColor="@android:color/white"
-            tools:text="Accepted 10 · Warning 2 · Retake 1 · Skipped 3 — 4.2 min" />
+            tools:text="Accepted 10 · Warning 2 · Retake 1 · Skipped 3 · 4.2 min" />
 
         <TextView
             android:id="@+id/overallProgressText"
@@ -36,7 +36,7 @@
             android:layout_marginTop="12dp"
             android:textColor="@android:color/white"
             android:textSize="12sp"
-            tools:text="Overall for this speaker: 46 / 300 min — 74 min to the 2h baseline" />
+            tools:text="Overall for this speaker: 46 / 300 min. 74 min to the 2h baseline." />
 
         <com.quantilytix.izwi.review.SessionMeterView
             android:id="@+id/overallProgressMeter"
@@ -49,7 +49,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="Script progress by category →"
+            android:text="Prompts: search, progress and jump →"
             android:textColor="@android:color/white"
             android:textStyle="bold"
             android:textSize="12sp" />

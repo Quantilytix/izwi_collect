@@ -1,0 +1,382 @@
+{
+  "script_version": "nd-freeform-v1",
+  "language": "nd",
+  "note": "Free-form collection script v1 for isiNdebele (2026-10-27), derived from freeform-v1, the Shona free-form script. The cue cards, topics and numbers are the same English prompts, in the same order. Ids carry the nd_ prefix, so they never collide with Shona ids. Every instruction that said Shona says Ndebele. Four categories, as in freeform-v1. free_form_cue (40): an English scenario plus key words; she speaks freely in Ndebele, mixing English as she naturally would, 30 to 90 s per take. own_words (20): an English topic; she replaces the prompt text with her own Ndebele through Edit prompt before the take, so the clip transcript is exactly what she read. free_form_numbers (10): amounts written the way a trader writes them; she says them in street register. session_start (5): 5 s of room tone, then one fixed price sentence, described here in English and said in Ndebele in the same words every session, for level, rate and pitch drift checks; calibration only, keep it out of training. This file holds no Ndebele text. For free_form_cue, free_form_numbers and session_start the stored transcript is the English prompt text and needs a verbatim Ndebele transcript (ASR draft plus native correction). own_words transcripts are her typed text.",
+  "prompts": [
+    {
+      "id": "nd_session_start_0001",
+      "category": "session_start",
+      "text": "Stay quiet for 5 seconds, then say this in Ndebele, in the same words every session:\nThe price of three bales is fifty."
+    },
+    {
+      "id": "nd_free_form_cue_0001",
+      "category": "free_form_cue",
+      "text": "A customer wants three bales of clothes but says your price is too high. Play both parts and agree on a price.\nKey words: three bales, $45 each, discount, cash today"
+    },
+    {
+      "id": "nd_free_form_cue_0002",
+      "category": "free_form_cue",
+      "text": "The supplier raised the price of sugar this week. Explain to a regular customer why your price went up.\nKey words: sugar, 2 kg, new price, supplier"
+    },
+    {
+      "id": "nd_free_form_cue_0003",
+      "category": "free_form_cue",
+      "text": "A customer walks along your shelf asking the price of one thing after another. Play both parts as she adds it all up.\nKey words: rice, cooking oil, soap, matches, total"
+    },
+    {
+      "id": "nd_free_form_cue_0004",
+      "category": "free_form_cue",
+      "text": "A loyal customer still owes you from last month. Remind him kindly and agree on a day to pay.\nKey words: credit, $30, last month, Friday"
+    },
+    {
+      "id": "nd_free_form_cue_0005",
+      "category": "free_form_cue",
+      "text": "A customer asks if she can pay with EcoCash and what the price is in ZiG. Play both parts.\nKey words: EcoCash, ZiG, US dollars, today's rate"
+    },
+    {
+      "id": "nd_free_form_cue_0006",
+      "category": "free_form_cue",
+      "text": "Your weekly report has arrived. Explain it out loud to your business partner: sales, expenses and profit.\nKey words: sales, expenses, profit, best day"
+    },
+    {
+      "id": "nd_free_form_cue_0007",
+      "category": "free_form_cue",
+      "text": "Your goods from Johannesburg are stuck at Beitbridge. Explain to waiting customers when they will arrive.\nKey words: supplier, border, delayed, Thursday"
+    },
+    {
+      "id": "nd_free_form_cue_0008",
+      "category": "free_form_cue",
+      "text": "A customer comes back upset because the phone charger you sold her has stopped working. Play both parts and sort it out.\nKey words: charger, receipt, exchange, sorry"
+    },
+    {
+      "id": "nd_free_form_cue_0009",
+      "category": "free_form_cue",
+      "text": "It rained all day and few people came to the market. Send a voice note about it to a friend who also trades.\nKey words: rain, slow day, few customers, tomorrow"
+    },
+    {
+      "id": "nd_free_form_cue_0010",
+      "category": "free_form_cue",
+      "text": "Saturday was a great day and you sold almost everything. Tell your family about it over supper.\nKey words: Saturday, sold out, busy, profit"
+    },
+    {
+      "id": "nd_free_form_cue_0011",
+      "category": "free_form_cue",
+      "text": "A young woman is starting a vegetable stall. Advise her to record every sale and keep business money apart from home money.\nKey words: records, every sale, home money, Smart-Qx"
+    },
+    {
+      "id": "nd_free_form_cue_0012",
+      "category": "free_form_cue",
+      "text": "It is stock day and your helper is counting with you. Ask her what is left on each shelf and decide what to reorder.\nKey words: how many, finished, reorder, wholesaler"
+    },
+    {
+      "id": "nd_free_form_cue_0013",
+      "category": "free_form_cue",
+      "text": "A woman wants ten chickens and asks for a better price for buying many. Ask how many she really needs, then make an offer.\nKey words: ten chickens, bulk price, discount, cash"
+    },
+    {
+      "id": "nd_free_form_cue_0014",
+      "category": "free_form_cue",
+      "text": "Explain to a customer why the EcoCash price is a little higher than the cash price.\nKey words: EcoCash, charges, cash price, fair"
+    },
+    {
+      "id": "nd_own_words_0001",
+      "category": "own_words",
+      "text": "Topic: Greet a regular customer who is back after a long time away.\nTap Edit prompt, type your own Ndebele, then read it."
+    },
+    {
+      "id": "nd_own_words_0002",
+      "category": "own_words",
+      "text": "Topic: Introduce yourself and your work at Smart-Qx.\nTap Edit prompt, type your own Ndebele, then read it."
+    },
+    {
+      "id": "nd_own_words_0003",
+      "category": "own_words",
+      "text": "Topic: Thank a customer for paying on time.\nTap Edit prompt, type your own Ndebele, then read it."
+    },
+    {
+      "id": "nd_own_words_0004",
+      "category": "own_words",
+      "text": "Topic: Ask a trader how business went this month. Write it as a question.\nTap Edit prompt, type your own Ndebele, then read it."
+    },
+    {
+      "id": "nd_own_words_0005",
+      "category": "own_words",
+      "text": "Topic: Tell a trader why writing down every sale helps.\nTap Edit prompt, type your own Ndebele, then read it."
+    },
+    {
+      "id": "nd_own_words_0006",
+      "category": "own_words",
+      "text": "Topic: Describe the market where you buy your stock.\nTap Edit prompt, type your own Ndebele, then read it."
+    },
+    {
+      "id": "nd_own_words_0007",
+      "category": "own_words",
+      "text": "Topic: Share a Ndebele proverb you like and what it means.\nTap Edit prompt, type your own Ndebele, then read it."
+    },
+    {
+      "id": "nd_free_form_numbers_0001",
+      "category": "free_form_numbers",
+      "text": "Tell a customer the price of each item, the way you would at your stall.\nTomatoes $1 a heap\nOnions 3 for $1\nCovo 50c a bundle\nPotatoes $5 a pocket"
+    },
+    {
+      "id": "nd_free_form_numbers_0002",
+      "category": "free_form_numbers",
+      "text": "Say these small prices to a customer.\n$1\n$2.50\ni50\n$0.80\n$10\nUS$20"
+    },
+    {
+      "id": "nd_free_form_numbers_0003",
+      "category": "free_form_numbers",
+      "text": "Tell a customer these prices in ZiG.\nZiG 20\nZiG 35\nZiG 200\nZiG 1,500\nZiG 27.50"
+    },
+    {
+      "id": "nd_free_form_numbers_0004",
+      "category": "free_form_numbers",
+      "text": "Tell a customer these prices in rand.\nR10\nR25\nR100\nR250\nR1,200"
+    },
+    {
+      "id": "nd_session_start_0002",
+      "category": "session_start",
+      "text": "Stay quiet for 5 seconds, then say this in Ndebele, in the same words every session:\nThe price of three bales is fifty."
+    },
+    {
+      "id": "nd_free_form_cue_0015",
+      "category": "free_form_cue",
+      "text": "A customer notices that bread costs more than last week and asks why. Play both parts.\nKey words: bread, flour, price went up, last week"
+    },
+    {
+      "id": "nd_free_form_cue_0016",
+      "category": "free_form_cue",
+      "text": "Phone a customer who promised to pay last week and now has an excuse. Play both parts and agree on a plan.\nKey words: promise, $50 owed, half now, month-end"
+    },
+    {
+      "id": "nd_free_form_cue_0017",
+      "category": "free_form_cue",
+      "text": "A new customer phones to ask what you sell and what things cost. Answer her and ask what she needs.\nKey words: delivery, prices, what do you need, WhatsApp"
+    },
+    {
+      "id": "nd_free_form_cue_0018",
+      "category": "free_form_cue",
+      "text": "Phone your supplier to ask where your order is. Play both parts as he explains the delay.\nKey words: order, truck, border, when"
+    },
+    {
+      "id": "nd_free_form_cue_0019",
+      "category": "free_form_cue",
+      "text": "Explain to a trader what her Smart-Qx weekly report says and what the numbers mean for her.\nKey words: report, top item, expenses, this week"
+    },
+    {
+      "id": "nd_free_form_cue_0020",
+      "category": "free_form_cue",
+      "text": "A customer says you were rude to her yesterday. Apologise and explain what happened.\nKey words: sorry, busy, yesterday, respect"
+    },
+    {
+      "id": "nd_free_form_cue_0021",
+      "category": "free_form_cue",
+      "text": "It is month-end and customers have money. Describe the rush and what sold fastest.\nKey words: month-end, salaries, queue, sold fastest"
+    },
+    {
+      "id": "nd_free_form_cue_0022",
+      "category": "free_form_cue",
+      "text": "A fellow trader asks how your sales were today. Play both parts as you compare your days.\nKey words: how was today, slow, month-end, school fees"
+    },
+    {
+      "id": "nd_free_form_cue_0023",
+      "category": "free_form_cue",
+      "text": "A trader asks how to stop losing money to credit. Answer her, and ask a few questions about her customers.\nKey words: credit, limit, who owes, cash only"
+    },
+    {
+      "id": "nd_free_form_cue_0024",
+      "category": "free_form_cue",
+      "text": "A customer says she sent the money on EcoCash, and the message has yet to reach your phone. Ask her to check, and sort it out together.\nKey words: EcoCash, message, number, wait"
+    },
+    {
+      "id": "nd_free_form_cue_0025",
+      "category": "free_form_cue",
+      "text": "On stock day you go to the wholesaler with a list and a budget. Talk through what you are buying and why.\nKey words: wholesaler, list, mealie meal, budget"
+    },
+    {
+      "id": "nd_free_form_cue_0026",
+      "category": "free_form_cue",
+      "text": "Cooking oil got cheaper this week. Tell your customers the good news and encourage them to stock up.\nKey words: cooking oil, 2 litres, cheaper, this week"
+    },
+    {
+      "id": "nd_free_form_cue_0027",
+      "category": "free_form_cue",
+      "text": "A customer keeps bargaining over a pair of shoes. Hold your price kindly and explain the quality.\nKey words: shoes, leather, $25, quality"
+    },
+    {
+      "id": "nd_own_words_0008",
+      "category": "own_words",
+      "text": "Topic: Ask a customer what she would like you to stock next. Write it as a question.\nTap Edit prompt, type your own Ndebele, then read it."
+    },
+    {
+      "id": "nd_own_words_0009",
+      "category": "own_words",
+      "text": "Topic: Describe today's weather and how it affects business.\nTap Edit prompt, type your own Ndebele, then read it."
+    },
+    {
+      "id": "nd_own_words_0010",
+      "category": "own_words",
+      "text": "Topic: Explain in simple steps how to send money with EcoCash.\nTap Edit prompt, type your own Ndebele, then read it."
+    },
+    {
+      "id": "nd_own_words_0011",
+      "category": "own_words",
+      "text": "Topic: Remind a supplier politely that the order is late.\nTap Edit prompt, type your own Ndebele, then read it."
+    },
+    {
+      "id": "nd_own_words_0012",
+      "category": "own_words",
+      "text": "Topic: Encourage a trader after a hard week.\nTap Edit prompt, type your own Ndebele, then read it."
+    },
+    {
+      "id": "nd_own_words_0013",
+      "category": "own_words",
+      "text": "Topic: Describe a busy Saturday at the market.\nTap Edit prompt, type your own Ndebele, then read it."
+    },
+    {
+      "id": "nd_own_words_0014",
+      "category": "own_words",
+      "text": "Topic: Ask a customer when she can come and collect her order. Write it as a question.\nTap Edit prompt, type your own Ndebele, then read it."
+    },
+    {
+      "id": "nd_free_form_numbers_0005",
+      "category": "free_form_numbers",
+      "text": "Offer these deals to a customer.\n3 for $5\n2 for $1\n5 for R20\na dozen for $6\nbuy 2, get 1 free"
+    },
+    {
+      "id": "nd_free_form_numbers_0006",
+      "category": "free_form_numbers",
+      "text": "Tell the customer her total and her change.\nTotal $17.50, she gives $20, change $2.50\nTotal ZiG 340, she gives ZiG 400, change ZiG 60"
+    },
+    {
+      "id": "nd_free_form_numbers_0007",
+      "category": "free_form_numbers",
+      "text": "Give each price in both currencies, the way you would say it.\n$5 or ZiG 135\n$10 or R180\n$1 or ZiG 27\nR50 or $3"
+    },
+    {
+      "id": "nd_session_start_0003",
+      "category": "session_start",
+      "text": "Stay quiet for 5 seconds, then say this in Ndebele, in the same words every session:\nThe price of three bales is fifty."
+    },
+    {
+      "id": "nd_free_form_cue_0028",
+      "category": "free_form_cue",
+      "text": "Your partner asks why profit fell this week when sales went up. Play both parts and explain.\nKey words: profit, sales up, transport, stock prices"
+    },
+    {
+      "id": "nd_free_form_cue_0029",
+      "category": "free_form_cue",
+      "text": "A customer says you gave her the wrong change. Ask questions to find out what happened, then put it right.\nKey words: change, $20, count, sorry"
+    },
+    {
+      "id": "nd_free_form_cue_0030",
+      "category": "free_form_cue",
+      "text": "Explain to your customers why this month you are selling for cash only.\nKey words: credit, stock, cash only, next month"
+    },
+    {
+      "id": "nd_free_form_cue_0031",
+      "category": "free_form_cue",
+      "text": "A customer paid a deposit for a fridge that is running late. Reassure her and give her the choices.\nKey words: deposit, delay, refund, wait"
+    },
+    {
+      "id": "nd_free_form_cue_0032",
+      "category": "free_form_cue",
+      "text": "From Monday you take ZiG, US dollars and rand. Tell your customers how you will set prices in each.\nKey words: ZiG, US dollars, rand, Monday, rate"
+    },
+    {
+      "id": "nd_free_form_cue_0033",
+      "category": "free_form_cue",
+      "text": "You reached your sales target for the month. Record a voice note to thank your helper.\nKey words: target, thank you, bonus, well done"
+    },
+    {
+      "id": "nd_free_form_cue_0034",
+      "category": "free_form_cue",
+      "text": "Sales have been slow all week. Talk through what you could do to bring customers back.\nKey words: slow week, special offer, WhatsApp, regulars"
+    },
+    {
+      "id": "nd_free_form_cue_0035",
+      "category": "free_form_cue",
+      "text": "A customer reads you her shopping list and asks for the total. Play both parts as you add it up and give her change.\nKey words: list, add up, total, change"
+    },
+    {
+      "id": "nd_free_form_cue_0036",
+      "category": "free_form_cue",
+      "text": "During the stock count you find some goods missing and some expired. Explain what happened and what you will change.\nKey words: expired, missing, stock count, next time"
+    },
+    {
+      "id": "nd_free_form_cue_0037",
+      "category": "free_form_cue",
+      "text": "A trader asks how Smart-Qx works on WhatsApp. Explain it step by step and ask what she sells.\nKey words: WhatsApp, record a sale, report, every day"
+    },
+    {
+      "id": "nd_free_form_cue_0038",
+      "category": "free_form_cue",
+      "text": "Compare this week with last week out loud: what went up, what went down, and why.\nKey words: last week, more, less, why"
+    },
+    {
+      "id": "nd_free_form_cue_0039",
+      "category": "free_form_cue",
+      "text": "Advise a trader on how to set the price of a new product.\nKey words: cost, transport, profit, other sellers"
+    },
+    {
+      "id": "nd_free_form_cue_0040",
+      "category": "free_form_cue",
+      "text": "A trader wants to give up after a bad month. Encourage her and help her plan the next step.\nKey words: bad month, keep going, plan, small steps"
+    },
+    {
+      "id": "nd_own_words_0015",
+      "category": "own_words",
+      "text": "Topic: Wish a customer well for the festive season.\nTap Edit prompt, type your own Ndebele, then read it."
+    },
+    {
+      "id": "nd_own_words_0016",
+      "category": "own_words",
+      "text": "Topic: Describe your favourite meal at home.\nTap Edit prompt, type your own Ndebele, then read it."
+    },
+    {
+      "id": "nd_own_words_0017",
+      "category": "own_words",
+      "text": "Topic: Tell a new trader one thing you wish you had known when you started.\nTap Edit prompt, type your own Ndebele, then read it."
+    },
+    {
+      "id": "nd_own_words_0018",
+      "category": "own_words",
+      "text": "Topic: Explain what a receipt is for.\nTap Edit prompt, type your own Ndebele, then read it."
+    },
+    {
+      "id": "nd_own_words_0019",
+      "category": "own_words",
+      "text": "Topic: Describe what you see on your way to work.\nTap Edit prompt, type your own Ndebele, then read it."
+    },
+    {
+      "id": "nd_own_words_0020",
+      "category": "own_words",
+      "text": "Topic: Ask a trader which product sells best for her, and why. Write it as a question.\nTap Edit prompt, type your own Ndebele, then read it."
+    },
+    {
+      "id": "nd_free_form_numbers_0008",
+      "category": "free_form_numbers",
+      "text": "Read your stock order to the supplier.\n20 bags of mealie meal at $9.50\n10 trays of eggs at $4\n5 boxes of soap at $12\nTotal $290"
+    },
+    {
+      "id": "nd_free_form_numbers_0009",
+      "category": "free_form_numbers",
+      "text": "Tell a customer what she owes and when to pay.\n$30 by Friday\n$15 now, $15 on the 30th\nR200 a week\nZiG 1,000 balance"
+    },
+    {
+      "id": "nd_free_form_numbers_0010",
+      "category": "free_form_numbers",
+      "text": "Tell a customer about charges and discounts.\n$20 plus 40c charges\n10% off\n$45 down to $40\nZiG 500 on EcoCash"
+    },
+    {
+      "id": "nd_session_start_0004",
+      "category": "session_start",
+      "text": "Stay quiet for 5 seconds, then say this in Ndebele, in the same words every session:\nThe price of three bales is fifty."
+    },
+    {
+      "id": "nd_session_start_0005",
+      "category": "session_start",
+      "text": "Stay quiet for 5 seconds, then say this in Ndebele, in the same words every session:\nThe price of three bales is fifty."
+    }
+  ]
+}

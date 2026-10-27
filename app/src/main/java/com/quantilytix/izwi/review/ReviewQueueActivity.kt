@@ -14,6 +14,7 @@ import com.quantilytix.izwi.data.ClipEntity
 import com.quantilytix.izwi.data.ReviewStatus
 import com.quantilytix.izwi.databinding.ActivityReviewQueueBinding
 import com.quantilytix.izwi.recording.RecordingActivity
+import com.quantilytix.izwi.session.ScriptEditorActivity
 import com.quantilytix.izwi.session.SessionManager
 import com.quantilytix.izwi.sync.SyncStatusActivity
 import com.quantilytix.izwi.ui.applySystemBarInsetPadding
@@ -61,7 +62,7 @@ class ReviewQueueActivity : AppCompatActivity() {
         }
 
         binding.scriptProgressLink.setOnClickListener {
-            startActivity(com.quantilytix.izwi.session.ScriptEditorActivity.intent(this, speakerId))
+            startActivity(ScriptEditorActivity.intent(this, speakerId))
         }
 
         binding.proceedToSyncButton.setOnClickListener {
@@ -78,12 +79,12 @@ class ReviewQueueActivity : AppCompatActivity() {
 
         binding.overallProgressText.text = if (totalMinutes < baselineMinutes) {
             String.format(
-                "Overall for this speaker: %.0f / %.0f min — %.0f min to the 2h baseline",
+                "Overall for this speaker: %.0f / %.0f min. %.0f min to the 2h baseline.",
                 totalMinutes, scaleMinutes, baselineMinutes - totalMinutes,
             )
         } else {
             String.format(
-                "Overall for this speaker: %.0f / %.0f min — 2h baseline reached, keep going",
+                "Overall for this speaker: %.0f / %.0f min. 2h baseline reached, keep going.",
                 totalMinutes, scaleMinutes,
             )
         }
@@ -96,7 +97,7 @@ class ReviewQueueActivity : AppCompatActivity() {
         val skipped = clips.count { it.reviewStatus == ReviewStatus.SKIPPED }
         val totalMinutes = clips.sumOf { it.durationSeconds } / 60.0
         binding.summaryText.text = String.format(
-            "Accepted %d · Warning %d · Retake %d · Skipped %d — %.1f min",
+            "Accepted %d · Warning %d · Retake %d · Skipped %d · %.1f min",
             accepted, warning, retake, skipped, totalMinutes,
         )
     }
@@ -138,7 +139,7 @@ class ReviewQueueActivity : AppCompatActivity() {
                     if (forcesRetake) {
                         android.widget.Toast.makeText(
                             this@ReviewQueueActivity,
-                            "Transcript changed — marked for retake so audio and text match",
+                            "Transcript changed. Marked for retake so audio and text match.",
                             android.widget.Toast.LENGTH_LONG,
                         ).show()
                         openRetake(clip.copy(transcript = newTranscript))
@@ -162,7 +163,7 @@ class ReviewQueueActivity : AppCompatActivity() {
      * speaker to find the prompt again by hand. This opens the recorder
      * straight on that prompt; accepting the new take returns here. */
     private fun openRetake(clip: ClipEntity) {
-        startActivity(RecordingActivity.retakeIntent(this, clip.promptId, clip.category, clip.transcript))
+        startActivity(RecordingActivity.retakeIntent(this, clip))
     }
 
     override fun onDestroy() {

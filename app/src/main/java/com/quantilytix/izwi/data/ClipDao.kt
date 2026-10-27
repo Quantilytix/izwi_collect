@@ -60,6 +60,40 @@ interface ClipDao {
             "GROUP BY category"
     )
     fun observeCategoryCountsForSpeaker(speakerId: String): Flow<List<CategoryCount>>
+
+    /** One row per prompt this speaker has any take of in [language], across
+     * every session. The Prompts screen reads status, take count and search
+     * text for all 6,106 prompts from this single grouped query. */
+    @Query(PROMPT_SUMMARY_QUERY)
+    fun observePromptSummaries(speakerId: String, language: String): Flow<List<PromptTakeSummary>>
 }
 
 data class CategoryCount(val category: String, val count: Int)
+
+/**
+ * [latest] is the newest take's recordedAtUtc and review status joined by
+ * "|". recordedAtUtc is fixed-width ISO UTC, so the string MAX is the newest
+ * take, without a second query or window functions (SQLite on API 26 has
+ * none). [keptVersions] lists the distinct prompt versions of accepted and
+ * warning takes, comma separated. [transcripts] joins every take's
+ * transcript with newlines, for search.
+ */
+data class PromptTakeSummary(
+    val promptId: String,
+    val takeCount: Int,
+    val keptCount: Int,
+    val keptVersions: String?,
+    val latest: String?,
+    val transcripts: String?,
+)
+
+// A constant so MigrationTest can run the exact SQL against a real SQLite.
+internal const val PROMPT_SUMMARY_QUERY =
+    "SELECT promptId, " +
+        "SUM(CASE WHEN reviewStatus != 'skipped' THEN 1 ELSE 0 END) AS takeCount, " +
+        "SUM(CASE WHEN reviewStatus IN ('accepted', 'warning') THEN 1 ELSE 0 END) AS keptCount, " +
+        "GROUP_CONCAT(DISTINCT CASE WHEN reviewStatus IN ('accepted', 'warning') THEN promptVersion END) AS keptVersions, " +
+        "MAX(recordedAtUtc || '|' || reviewStatus) AS latest, " +
+        "GROUP_CONCAT(transcript, char(10)) AS transcripts " +
+        "FROM clips WHERE speakerId = :speakerId AND language = :language " +
+        "GROUP BY promptId"

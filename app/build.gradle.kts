@@ -27,8 +27,8 @@ android {
         applicationId = "com.quantilytix.izwi"
         minSdk = 26
         targetSdk = 35
-        versionCode = 6
-        versionName = "0.6.0"
+        versionCode = 7
+        versionName = "0.7.0"
 
         buildConfigField("String", "RELAY_BASE_URL", "\"$relayBaseUrl\"")
         buildConfigField("String", "RELAY_API_KEY", "\"$relayApiKey\"")
@@ -48,6 +48,12 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions { jvmTarget = "17" }
+}
+
+// Exported Room schemas are checked in, so MigrationTest can compare a
+// migrated database against the schema Room expects.
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 dependencies {
@@ -75,5 +81,9 @@ dependencies {
     // Local unit tests see only android.jar stubs; this is the real org.json
     // so BatchExporterTest can read back the metadata.jsonl it builds.
     testImplementation("org.json:json:20240303")
+    // A real SQLite for MigrationTest: it runs the Room migrations and the
+    // grouped prompt-summary query on the JVM. The version Room's compiler
+    // already uses, so it comes from the same cache.
+    testImplementation("org.xerial:sqlite-jdbc:3.41.2.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
 }

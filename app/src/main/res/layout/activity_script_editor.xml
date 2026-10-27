@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -13,13 +14,182 @@
         android:padding="16dp"
         android:background="@color/izwi_primary">
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Script"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Prompts"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/packButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="44dp"
+                android:gravity="center_vertical"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                tools:text="Pack: Shona read script (edited) ▾" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/progressText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:textColor="@android:color/white"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:textSize="12sp"
+            tools:text="Recorded 1,234 of 6,106 · 4,872 outstanding · 31 need a retake" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:layout_marginTop="6dp"
+            android:progressTint="@color/izwi_accent"
+            android:progressBackgroundTint="@android:color/white" />
+    </LinearLayout>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        app:elevation="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="8dp"
+        app:layout_scrollFlags="scroll|enterAlways|snap">
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/languageToggle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:singleSelection="true"
+            app:selectionRequired="true">
+
+            <Button
+                android:id="@+id/languageShonaButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Shona" />
+
+            <Button
+                android:id="@+id/languageNdebeleButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="isiNdebele" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <EditText
+            android:id="@+id/searchInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:drawableStart="@android:drawable/ic_menu_search"
+            android:drawablePadding="4dp"
+            android:hint="Search text, id, category or your takes"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:maxLines="1" />
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/filterChips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:singleLine="true"
+                app:singleSelection="true"
+                app:selectionRequired="true">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipAll"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="All" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipOutstanding"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Outstanding" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipRecorded"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Recorded" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipNeedsRetake"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Needs retake" />
+            </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <Button
+                android:id="@+id/categoryButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:textColor="@color/izwi_primary"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="start|center_vertical"
+                android:textAllCaps="false"
+                android:maxLines="1"
+                android:ellipsize="end"
+                tools:text="All categories ▾" />
+
+            <Button
+                android:id="@+id/recordCategoryButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Record this category"
+                android:textAllCaps="false"
+                android:backgroundTint="@color/izwi_primary"
+                android:visibility="gone" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -28,83 +198,62 @@
             android:gravity="center_vertical">
 
             <TextView
-                android:id="@+id/promptCountText"
+                android:id="@+id/resultCountText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginTop="4dp"
-                android:textColor="@android:color/white"
-                tools:text="40 prompts — SALES EXPENSE REPLIES only" />
+                android:textColor="@color/izwi_muted"
+                android:textSize="12sp"
+                tools:text="Showing 4,872 prompts" />
 
-            <TextView
-                android:id="@+id/clearFilterButton"
+            <Button
+                android:id="@+id/addPromptButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:textColor="@color/izwi_primary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="SHOW ALL"
-                android:textColor="@android:color/white"
-                android:textStyle="bold"
-                android:textSize="12sp"
-                android:visibility="gone" />
+                android:text="Add prompt" />
+
+            <Button
+                android:id="@+id/resetScriptButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:textColor="@color/izwi_warning"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reset" />
         </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="-12dp"
+            android:layout_marginEnd="-12dp"
+            android:background="#E5E5E5" />
     </LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
-    <ScrollView
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="280dp">
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
-            android:id="@+id/categoryProgressContainer"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/promptsRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false" />
+
+        <TextView
+            android:id="@+id/emptyText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="12dp" />
-    </ScrollView>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#E5E5E5" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="8dp">
-
-        <Button
-            android:id="@+id/addPromptButton"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:textColor="@color/izwi_primary"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Add prompt" />
-
-        <Button
-            android:id="@+id/importScriptButton"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:textColor="@color/izwi_primary"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Import file" />
-
-        <Button
-            android:id="@+id/resetScriptButton"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:textColor="@color/izwi_warning"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Reset" />
-
-    </LinearLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/promptsRecycler"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false" />
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="24dp"
+            android:textColor="@color/izwi_muted"
+            android:visibility="gone"
+            tools:text="No prompts match." />
+    </FrameLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </LinearLayout>

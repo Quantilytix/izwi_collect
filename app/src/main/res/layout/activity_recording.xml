@@ -1,18 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="20dp">
 
-    <TextView
-        android:id="@+id/progressText"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="end"
-        android:textColor="@color/izwi_muted"
-        tools:text="12 / 40" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <Button
+            android:id="@+id/promptsButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Prompts"
+            android:textColor="@color/izwi_primary"
+            app:icon="@android:drawable/ic_menu_search"
+            app:iconTint="@color/izwi_primary" />
+
+        <TextView
+            android:id="@+id/progressText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:gravity="end"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:textColor="@color/izwi_muted"
+            tools:text="Shona · Outstanding · 12 / 40" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -147,16 +169,6 @@
             android:layout_weight="1"
             android:layout_marginTop="8dp"
             android:text="Review queue"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:textColor="@color/izwi_primary" />
-
-        <Button
-            android:id="@+id/scriptProgressButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginTop="8dp"
-            android:text="Script progress"
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:textColor="@color/izwi_primary" />
 

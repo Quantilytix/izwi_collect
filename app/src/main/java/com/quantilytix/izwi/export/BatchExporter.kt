@@ -9,14 +9,14 @@ import java.util.UUID
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
-// prompt_id and category were added in v0.6.0 and go last on purpose: the
-// sixteen columns before them keep their names and order, so a reader that
-// indexes columns by position still works.
+// prompt_id and category were added in v0.6.0, prompt_version in v0.7.0,
+// each appended at the end on purpose: the columns before them keep their
+// names and order, so a reader that indexes columns by position still works.
 internal val MANIFEST_HEADER = listOf(
     "clip_id", "speaker_id", "session_id", "language", "transcript", "sample_rate",
     "duration_seconds", "quality_score", "snr_proxy", "speech_ratio", "clipping_detected",
     "recorded_at_utc", "device_model", "consent_version", "script_version", "review_status",
-    "prompt_id", "category",
+    "prompt_id", "category", "prompt_version",
 )
 
 /** Bounded upload batches of ~20-30 minutes, per PLAN_B Phase 5 — a full raw
@@ -40,6 +40,13 @@ object BatchChunker {
         if (current.isNotEmpty()) batches.add(current)
         return batches
     }
+
+    /** One upload batch never mixes languages: clips are grouped by language
+     * (in order of first appearance, keeping their order within a group),
+     * then each group is bounded by duration. A session can hold both
+     * languages since the Prompts screen switches mid-session. */
+    fun chunkByLanguageAndDuration(clips: List<ClipEntity>): List<List<ClipEntity>> =
+        clips.groupBy { it.language }.values.flatMap { chunkByDuration(it) }
 }
 
 object BatchExporter {
@@ -101,7 +108,7 @@ object BatchExporter {
                 c.sampleRate.toString(), c.durationSeconds.toString(), c.qualityScore.toString(),
                 c.snrProxy.toString(), c.speechRatio.toString(), c.clippingDetected.toString(),
                 c.recordedAtUtc, c.deviceModel, c.consentVersion, c.scriptVersion, c.reviewStatus,
-                c.promptId, c.category,
+                c.promptId, c.category, c.promptVersion.toString(),
             )
             sb.append(row.joinToString(",") { csvEscape(it) }).append("\n")
         }
@@ -130,6 +137,7 @@ object BatchExporter {
             obj.put("review_status", c.reviewStatus)
             obj.put("prompt_id", c.promptId)
             obj.put("category", c.category)
+            obj.put("prompt_version", c.promptVersion)
             sb.append(obj.toString()).append("\n")
         }
         return sb.toString()
